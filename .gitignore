@@ -1,0 +1,27 @@
+# Node.js dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Databases & local logs
+*.db
+*.db-journal
+*.log
+npm-debug.log*
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Backend uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
