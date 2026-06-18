@@ -20,7 +20,12 @@ import {
   RotateCw,
   Download,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Save,
+  Upload,
+  File,
+  AlertCircle,
+  CheckCircle2
 } from 'lucide-react';
 
 // ==========================================
@@ -285,6 +290,202 @@ const CandidateRow = memo(function CandidateRow({ c, index, hasRole, onView, onD
 
 export default function CandidatesPage() {
   const { token, hasRole, logout } = useAuth();
+  
+  // Add Candidate Modal States
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [activeFormTab, setActiveFormTab] = useState('personal'); // 'personal' | 'compensation' | 'resume'
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [skills, setSkills] = useState('');
+  const [location, setLocation] = useState('');
+  const [experienceYears, setExperienceYears] = useState('');
+  const [status, setStatus] = useState('Applied');
+  const [currentCtc, setCurrentCtc] = useState('');
+  const [expectedCtc, setExpectedCtc] = useState('');
+  const [noticePeriod, setNoticePeriod] = useState('');
+  const [company, setCompany] = useState('');
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [preferredLocation, setPreferredLocation] = useState('');
+  const [remarks, setRemarks] = useState('');
+  const [comment, setComment] = useState('');
+
+  // Upload States
+  const [resumeFile, setResumeFile] = useState(null);
+  const [isDragActive, setIsDragActive] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+
+  // Form action status states
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState('');
+
+  const resetForm = () => {
+    setActiveFormTab('personal');
+    setName('');
+    setEmail('');
+    setPhone('');
+    setSkills('');
+    setLocation('');
+    setExperienceYears('');
+    setStatus('Applied');
+    setCurrentCtc('');
+    setExpectedCtc('');
+    setNoticePeriod('');
+    setCompany('');
+    setLinkedinUrl('');
+    setPreferredLocation('');
+    setRemarks('');
+    setComment('');
+    setResumeFile(null);
+    setIsDragActive(false);
+    setUploadSuccess(false);
+    setFormError('');
+    setFormSuccess('');
+  };
+
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = isAddModalOpen ? 'hidden' : 'auto';
+    if (isAddModalOpen) {
+      resetForm();
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isAddModalOpen]);
+
+  // ESC key handler to close modal
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        setIsAddModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, []);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragActive(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragActive(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setResumeFile(e.dataTransfer.files[0]);
+      setUploadSuccess(false);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setResumeFile(e.target.files[0]);
+      setUploadSuccess(false);
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setFormError('');
+    setFormSuccess('');
+    
+    if (!name || !email || !skills || !location || experienceYears === undefined || experienceYears === '') {
+      setFormError('Please fill in all required fields.');
+      return;
+    }
+
+    setFormLoading(true);
+
+    try {
+      const payload = {
+        name,
+        email,
+        phone,
+        skills,
+        location,
+        experience_years: parseFloat(experienceYears),
+        status,
+        current_ctc: currentCtc ? parseFloat(currentCtc) : null,
+        expected_ctc: expectedCtc ? parseFloat(expectedCtc) : null,
+        notice_period_days: noticePeriod ? parseInt(noticePeriod) : null,
+        company,
+        linkedin_url: linkedinUrl,
+        preferred_location: preferredLocation,
+        remarks,
+        comment
+      };
+
+      const response = await fetch(`${API_URL}/candidates`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        logout();
+        return;
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit candidate profile');
+      }
+
+      const activeCandidateId = data.id;
+
+      // Handle resume file upload if selected
+      if (resumeFile && !uploadSuccess) {
+        const formData = new FormData();
+        formData.append('resume', resumeFile);
+        formData.append('candidate_id', activeCandidateId);
+
+        const uploadRes = await fetch(`${API_URL}/uploads`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        if (uploadRes.status === 401 || uploadRes.status === 403) {
+          logout();
+          return;
+        }
+
+        if (!uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          throw new Error(`Profile saved, but upload failed: ${uploadData.error || 'Upload error'}`);
+        }
+        setUploadSuccess(true);
+      }
+
+      setFormSuccess('Candidate profile successfully created!');
+      
+      // Dynamic refresh
+      fetchCandidates();
+
+      // Close modal after delay
+      setTimeout(() => {
+        setIsAddModalOpen(false);
+      }, 1500);
+
+    } catch (err) {
+      setFormError(err.message);
+    } finally {
+      setFormLoading(false);
+    }
+  };
   
   // Search & Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -715,10 +916,13 @@ export default function CandidatesPage() {
               <Download size={16} />
               <span>{importing ? 'Importing...' : 'Import'}</span>
             </button>
-            <Link href="/candidates/new" className="btn btn-primary">
+            <button 
+              onClick={() => setIsAddModalOpen(true)} 
+              className="btn btn-primary"
+            >
               <Plus size={16} />
               <span>Add Candidate</span>
-            </Link>
+            </button>
           </div>
         )}
       </div>
@@ -1105,7 +1309,7 @@ export default function CandidatesPage() {
                     <div key={doc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface-dim)', border: '1px solid var(--border)', padding: '0.5rem 1rem', borderRadius: '6px' }}>
                       <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{doc.file_name}</span>
                       <a 
-                        href={`http://localhost:5000/uploads/${doc.file_path.split('\\').pop()}`}
+                        href={`${API_URL}/uploads/${doc.file_path.split('\\').pop()}`}
                         target="_blank"
                         rel="noreferrer"
                         className="btn btn-secondary"
@@ -1277,13 +1481,447 @@ export default function CandidatesPage() {
             <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--danger)' }}>Import Failed</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
               {importError === 'Failed to fetch' 
-                ? 'Could not connect to the backend server. Please verify that the backend API server is running on http://localhost:5000.' 
+                ? `Could not connect to the backend server. Please verify that the backend API server is running at ${API_URL}.` 
                 : importError}
             </p>
 
             <button onClick={() => setImportError('')} className="btn" style={{ width: '100%', background: 'var(--danger)', borderColor: 'var(--danger)', color: '#ffffff', borderRadius: '6px' }}>
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add Candidate Modal Overlay */}
+      {isAddModalOpen && (
+        <div 
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsAddModalOpen(false);
+            }
+          }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(7, 10, 19, 0.75)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999,
+            padding: '1.5rem',
+            animation: 'fadeIn 0.25s ease-out'
+          }}
+        >
+          <div 
+            style={{ 
+              background: 'var(--bg-surface)', 
+              border: '1px solid var(--border)', 
+              borderRadius: 'var(--radius-lg)', 
+              width: '100%', 
+              maxWidth: '800px', 
+              maxHeight: '90vh', 
+              overflowY: 'auto', 
+              boxShadow: 'var(--shadow)',
+              padding: '1.5rem 2rem', 
+              position: 'relative',
+              animation: 'scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+            }}
+          >
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsAddModalOpen(false)}
+              style={{ 
+                position: 'absolute', 
+                right: '1.5rem', 
+                top: '1.5rem', 
+                background: 'transparent', 
+                border: 'none', 
+                cursor: 'pointer', 
+                color: 'var(--text-secondary)',
+                transition: 'var(--ease)'
+              }}
+              className="action-icon-btn action-delete-btn"
+              title="Close modal"
+            >
+              <X size={20} />
+            </button>
+
+            <div style={{ marginBottom: '1.25rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-primary)' }}>Add New Candidate</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Enter details to update the recruitment tracking database.</p>
+            </div>
+
+            {formError && (
+              <div style={{ 
+                background: 'rgba(239, 68, 68, 0.1)', 
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '8px', 
+                padding: '0.75rem 1rem', 
+                color: 'var(--danger)',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: '0.85rem'
+              }}>
+                <AlertCircle size={18} />
+                <span>{formError}</span>
+              </div>
+            )}
+
+            {formSuccess && (
+              <div style={{ 
+                background: 'rgba(16, 185, 129, 0.1)', 
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '8px', 
+                padding: '0.75rem 1rem', 
+                color: 'var(--accent)',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: '0.85rem'
+              }}>
+                <CheckCircle2 size={18} />
+                <span>{formSuccess}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleFormSubmit}>
+              {/* Tab Pill Selectors */}
+              <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1.25rem', background: 'var(--bg-surface-dim)', padding: '4px', borderRadius: '9999px', border: '1px solid var(--border)', width: 'fit-content' }}>
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('personal')}
+                  style={{
+                    padding: '0.4rem 1.25rem',
+                    border: 'none',
+                    background: activeFormTab === 'personal' ? 'var(--accent-dim)' : 'transparent',
+                    border: activeFormTab === 'personal' ? '1px solid rgba(163, 230, 53, 0.15)' : '1px solid transparent',
+                    color: activeFormTab === 'personal' ? 'var(--accent)' : 'var(--text-secondary)',
+                    borderRadius: '9999px',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'var(--ease)'
+                  }}
+                >
+                  1. Personal Details
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('compensation')}
+                  style={{
+                    padding: '0.4rem 1.25rem',
+                    border: 'none',
+                    background: activeFormTab === 'compensation' ? 'var(--accent-dim)' : 'transparent',
+                    border: activeFormTab === 'compensation' ? '1px solid rgba(163, 230, 53, 0.15)' : '1px solid transparent',
+                    color: activeFormTab === 'compensation' ? 'var(--accent)' : 'var(--text-secondary)',
+                    borderRadius: '9999px',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'var(--ease)'
+                  }}
+                >
+                  2. Status & CTC
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('resume')}
+                  style={{
+                    padding: '0.4rem 1.25rem',
+                    border: 'none',
+                    background: activeFormTab === 'resume' ? 'var(--accent-dim)' : 'transparent',
+                    border: activeFormTab === 'resume' ? '1px solid rgba(163, 230, 53, 0.15)' : '1px solid transparent',
+                    color: activeFormTab === 'resume' ? 'var(--accent)' : 'var(--text-secondary)',
+                    borderRadius: '9999px',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'var(--ease)'
+                  }}
+                >
+                  3. Resume & Notes
+                </button>
+              </div>
+
+              {/* Tab 1: Personal Details */}
+              <div style={{ display: activeFormTab === 'personal' ? 'grid' : 'none', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Full Name *</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Email Address *</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="john.doe@gmail.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Phone Number</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="+91 9876543210"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Current Location *</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="Mumbai"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Company</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="Infosys"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>LinkedIn Link / URL</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="linkedin.com/in/username"
+                    value={linkedinUrl}
+                    onChange={(e) => setLinkedinUrl(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem', gridColumn: 'span 2' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Skills (Comma separated) *</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="React, Node.js, SQL"
+                    value={skills}
+                    onChange={(e) => setSkills(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Experience * (Years)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="3.5"
+                    value={experienceYears}
+                    onChange={(e) => setExperienceYears(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Tab 2: Status & CTC */}
+              <div style={{ display: activeFormTab === 'compensation' ? 'grid' : 'none', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Current Status *</label>
+                  <select
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', appearance: 'none', background: 'rgba(255, 255, 255, 0.04)' }}
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                  >
+                    <option value="Applied" style={{ background: 'var(--bg-panel-solid)' }}>Applied</option>
+                    <option value="Screening" style={{ background: 'var(--bg-panel-solid)' }}>Screening</option>
+                    <option value="Interviewing" style={{ background: 'var(--bg-panel-solid)' }}>Interviewing</option>
+                    <option value="Offered" style={{ background: 'var(--bg-panel-solid)' }}>Offered</option>
+                    <option value="Hired" style={{ background: 'var(--bg-panel-solid)' }}>Hired</option>
+                    <option value="Rejected" style={{ background: 'var(--bg-panel-solid)' }}>Rejected</option>
+                  </select>
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Preferred Location</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="Pune"
+                    value={preferredLocation}
+                    onChange={(e) => setPreferredLocation(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Notice Period (Days)</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="30"
+                    value={noticePeriod}
+                    onChange={(e) => setNoticePeriod(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Current CTC (Annualized)</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="1200000"
+                    value={currentCtc}
+                    onChange={(e) => setCurrentCtc(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '0.4rem' }}>
+                  <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Expected CTC (Annualized)</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
+                    placeholder="1500000"
+                    value={expectedCtc}
+                    onChange={(e) => setExpectedCtc(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Tab 3: Resume & Notes */}
+              <div style={{ display: activeFormTab === 'resume' ? 'block' : 'none' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '1.25rem', alignItems: 'start' }}>
+                  <div>
+                    <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                      <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Remarks</label>
+                      <textarea
+                        className="form-input"
+                        placeholder="Enter remarks..."
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                        style={{ minHeight: '75px', maxHeight: '110px', fontSize: '0.8rem', padding: '0.5rem', fontFamily: 'inherit', resize: 'vertical' }}
+                      />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                      <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Comment</label>
+                      <textarea
+                        className="form-input"
+                        placeholder="Enter comments..."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        style={{ minHeight: '75px', maxHeight: '110px', fontSize: '0.8rem', padding: '0.5rem', fontFamily: 'inherit', resize: 'vertical' }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                      <label className="form-label" style={{ marginBottom: '0.3rem', fontSize: '0.7rem' }}>Resume Document (PDF/DOCX/TXT)</label>
+                      <div 
+                        className={`dropzone ${isDragActive ? 'active' : ''}`}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        onClick={() => document.getElementById('modal-file-upload-input').click()}
+                        style={{ padding: '1.25rem', border: '1px dashed var(--border)', borderRadius: '12px', textAlign: 'center', cursor: 'pointer' }}
+                      >
+                        <input
+                          id="modal-file-upload-input"
+                          type="file"
+                          style={{ display: 'none' }}
+                          accept=".pdf,.docx,.doc,.txt"
+                          onChange={handleFileChange}
+                        />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                          <Upload size={24} style={{ color: 'var(--text-secondary)', marginBottom: '0.25rem' }} />
+                          {resumeFile ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-primary)', fontSize: '0.75rem' }}>
+                              <File size={14} className="kpi-cyan" />
+                              <span style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{resumeFile.name}</span>
+                            </div>
+                          ) : (
+                            <>
+                              <p style={{ fontWeight: '600', color: 'var(--text-primary)', fontSize: '0.8rem' }}>Drag or click to upload</p>
+                              <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Max 10MB</p>
+                            </>
+                          )}
+                          {uploadSuccess && (
+                            <span style={{ fontSize: '0.7rem', color: 'var(--accent-emerald)', marginTop: '0.25rem' }}>
+                              ✓ Uploaded.
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action buttons bar */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '0.85rem', marginTop: '0.85rem' }}>
+                <div style={{ display: 'flex', gap: '0.35rem' }}>
+                  {activeFormTab !== 'personal' && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveFormTab(activeFormTab === 'resume' ? 'compensation' : 'personal')}
+                      className="btn btn-secondary"
+                      style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', borderRadius: '9999px', border: '1px solid var(--border)' }}
+                    >
+                      Back
+                    </button>
+                  )}
+                  {activeFormTab !== 'resume' && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveFormTab(activeFormTab === 'personal' ? 'compensation' : 'resume')}
+                      className="btn btn-primary"
+                      style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', borderRadius: '9999px' }}
+                    >
+                      Next Step
+                    </button>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setIsAddModalOpen(false)} 
+                    className="btn btn-secondary"
+                    style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', borderRadius: '9999px', border: '1px solid var(--border)' }}
+                    disabled={formLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary"
+                    style={{ padding: '0.4rem 1.25rem', fontSize: '0.8rem', borderRadius: '9999px' }}
+                    disabled={formLoading}
+                  >
+                    <Save size={14} />
+                    <span>{formLoading ? 'Saving...' : 'Save Profile'}</span>
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -1482,13 +2120,23 @@ export default function CandidatesPage() {
           height: 40px;
           border: 4px solid rgba(255, 255, 255, 0.1);
           border-top: 4px solid var(--accent);
-          borderRadius: 50%;
+          border-radius: 50%;
           animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
         }
       `}</style>
     </div>

@@ -7,7 +7,6 @@ import { useAuth } from '@/context/AuthContext';
 import { 
   LayoutDashboard, 
   Users, 
-  UserPlus, 
   BarChart3, 
   ShieldAlert, 
   LogOut,
@@ -32,12 +31,6 @@ export default function Sidebar() {
       path: '/candidates',
       icon: <Users size={20} />,
       roles: ['Admin', 'Recruitment Team', 'Management', 'IT Team']
-    },
-    {
-      name: 'Add Candidate',
-      path: '/candidates/new',
-      icon: <UserPlus size={20} />,
-      roles: ['Admin', 'Recruitment Team']
     },
     {
       name: 'Reports',
