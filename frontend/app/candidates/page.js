@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import ModalWrapper from '@/components/ModalWrapper';
 import { API_URL } from '@/config';
 import { 
   Search, 
@@ -344,27 +345,12 @@ export default function CandidatesPage() {
     setFormSuccess('');
   };
 
-  // Lock background scroll when modal is open
+  // Reset form when modal opens
   useEffect(() => {
-    document.body.style.overflow = isAddModalOpen ? 'hidden' : 'auto';
     if (isAddModalOpen) {
       resetForm();
     }
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
   }, [isAddModalOpen]);
-
-  // ESC key handler to close modal
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') {
-        setIsAddModalOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, []);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -1144,22 +1130,12 @@ export default function CandidatesPage() {
       </div>
 
       {/* Candidate Profile Details Modal */}
-      {selectedCandidate && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(7, 10, 19, 0.8)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 999,
-          padding: '1.5rem'
-        }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '640px', padding: '2rem', position: 'relative' }}>
+      <ModalWrapper
+        isOpen={!!selectedCandidate}
+        onClose={() => setSelectedCandidate(null)}
+      >
+        {selectedCandidate && (
+          <div className="glass-card modal-content" style={{ width: '100%', maxWidth: '640px', padding: '2rem', position: 'relative' }}>
             <button 
               onClick={() => setSelectedCandidate(null)}
               style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
@@ -1336,50 +1312,30 @@ export default function CandidatesPage() {
               )}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </ModalWrapper>
 
       {/* Import Loading Overlay */}
-      {importing && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(7, 10, 19, 0.75)',
-          backdropFilter: 'blur(6px)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div className="glass-card" style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '360px' }}>
-            <div className="spin-loader" />
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', fontWeight: '600' }}>Importing Candidates...</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Please wait while the Excel sheet data is parsed, validated, and imported.</p>
-          </div>
+      <ModalWrapper
+        isOpen={importing}
+        onClose={() => {}}
+        closeOnOutsideClick={false}
+        closeOnEsc={false}
+      >
+        <div className="glass-card modal-content" style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '360px' }}>
+          <div className="spin-loader" />
+          <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', fontWeight: '600' }}>Importing Candidates...</h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Please wait while the Excel sheet data is parsed, validated, and imported.</p>
         </div>
-      )}
+      </ModalWrapper>
 
       {/* Import Summary Modal */}
-      {importSummary && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(7, 10, 19, 0.8)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 999,
-          padding: '1.5rem'
-        }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '480px', padding: '2rem', position: 'relative', textAlign: 'center' }}>
+      <ModalWrapper
+        isOpen={!!importSummary}
+        onClose={() => setImportSummary(null)}
+      >
+        {importSummary && (
+          <div className="glass-card modal-content" style={{ width: '100%', maxWidth: '480px', padding: '2rem', position: 'relative', textAlign: 'center' }}>
             <button 
               onClick={() => setImportSummary(null)}
               style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
@@ -1438,26 +1394,16 @@ export default function CandidatesPage() {
               Done
             </button>
           </div>
-        </div>
-      )}
+        )}
+      </ModalWrapper>
 
       {/* Import Error Modal */}
-      {importError && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(7, 10, 19, 0.8)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 999,
-          padding: '1.5rem'
-        }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '400px', padding: '2rem', position: 'relative', textAlign: 'center' }}>
+      <ModalWrapper
+        isOpen={!!importError}
+        onClose={() => setImportError('')}
+      >
+        {importError && (
+          <div className="glass-card modal-content" style={{ width: '100%', maxWidth: '400px', padding: '2rem', position: 'relative', textAlign: 'center' }}>
             <button 
               onClick={() => setImportError('')}
               style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
@@ -1489,48 +1435,29 @@ export default function CandidatesPage() {
               Close
             </button>
           </div>
-        </div>
-      )}
+        )}
+      </ModalWrapper>
 
       {/* Add Candidate Modal Overlay */}
-      {isAddModalOpen && (
+      <ModalWrapper
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      >
         <div 
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setIsAddModalOpen(false);
-            }
-          }}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(7, 10, 19, 0.75)',
-            backdropFilter: 'blur(6px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 999,
-            padding: '1.5rem',
-            animation: 'fadeIn 0.25s ease-out'
+          className="modal-content"
+          style={{ 
+            background: 'var(--bg-surface)', 
+            border: '1px solid var(--border)', 
+            borderRadius: 'var(--radius-lg)', 
+            width: '100%', 
+            maxWidth: '800px', 
+            maxHeight: '90vh', 
+            overflowY: 'auto', 
+            boxShadow: 'var(--shadow)',
+            padding: '1.5rem 2rem', 
+            position: 'relative',
           }}
         >
-          <div 
-            style={{ 
-              background: 'var(--bg-surface)', 
-              border: '1px solid var(--border)', 
-              borderRadius: 'var(--radius-lg)', 
-              width: '100%', 
-              maxWidth: '800px', 
-              maxHeight: '90vh', 
-              overflowY: 'auto', 
-              boxShadow: 'var(--shadow)',
-              padding: '1.5rem 2rem', 
-              position: 'relative',
-              animation: 'scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
-            }}
-          >
             {/* Close Button */}
             <button 
               onClick={() => setIsAddModalOpen(false)}
@@ -1923,8 +1850,7 @@ export default function CandidatesPage() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+      </ModalWrapper>
 
       {/* Embedded UI Style System overrides */}
       <style>{`
@@ -2127,16 +2053,6 @@ export default function CandidatesPage() {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        @keyframes scaleIn {
-          from { transform: scale(0.95); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
         }
       `}</style>
     </div>
