@@ -4,11 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { 
-  LayoutDashboard, 
-  Users, 
-  BarChart3, 
-  ShieldAlert, 
+import {
+  LayoutDashboard,
+  Users,
+  BarChart3,
+  ShieldAlert,
   LogOut,
   Zap
 } from 'lucide-react';
@@ -50,7 +50,7 @@ export default function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-logo">
         <Zap size={18} />
-        <span>Recruit Pro</span>
+        <span>Paycheck Alpha</span>
       </div>
 
       <nav style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -63,8 +63,8 @@ export default function Sidebar() {
 
             return (
               <li key={item.name}>
-                <Link 
-                  href={item.path} 
+                <Link
+                  href={item.path}
                   className={`sidebar-link ${isActive ? 'active' : ''}`}
                 >
                   {item.icon}

@@ -10,7 +10,7 @@ const hankenGrotesk = Hanken_Grotesk({
 });
 
 export const metadata = {
-  title: "Precision Recruit Pro — CRDMS",
+  title: "Paycheck Alpha — CRDMS",
   description: "A centralized dashboard for candidate profile tracking, role-based access management, recruitment search speedups, and audit log tracking.",
 };
 
