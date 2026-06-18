@@ -7,54 +7,54 @@
 
 :root {
   /* Core Palette */
-  --bg-base:        #09090b; /* Softer iOS-style dark slate black */
-  --bg-surface:     rgba(26, 26, 32, 0.75); /* Increased opacity card backgrounds */
-  --bg-surface-dim: rgba(18, 18, 22, 0.7);
-  --bg-surface-up:  rgba(38, 38, 46, 0.7);
-  --bg-surface-hi:  rgba(50, 50, 60, 0.75);
+  --bg-base:        #F5F5F5; /* Light Gray Background */
+  --bg-surface:     #FFFFFF; /* White card surface */
+  --bg-surface-dim: #EAEAEA;
+  --bg-surface-up:  #F0F0F0;
+  --bg-surface-hi:  #E5E5E5;
 
   /* Borders */
-  --border:         rgba(255, 255, 255, 0.08); /* Inset/subtle white borders */
-  --border-focus:   #A3E635;
-  --border-subtle:  rgba(255, 255, 255, 0.04);
+  --border:         #D9D9D9; /* Border Gray */
+  --border-focus:   #0D7CC1; /* Primary Blue */
+  --border-subtle:  #E5E5E5;
 
-  /* Neon Accent — Electric Lime */
-  --accent:         #A3E635;
-  --accent-dim:     rgba(163, 230, 53, 0.08);
-  --accent-glow:    rgba(163, 230, 53, 0.2);
-  --accent-gradient: linear-gradient(135deg, #1f2e08 0%, #111a05 100%);
+  /* Primary Blue Accent */
+  --accent:         #0D7CC1;
+  --accent-dim:     rgba(13, 124, 193, 0.08);
+  --accent-glow:    rgba(13, 124, 193, 0.2);
+  --accent-gradient: linear-gradient(135deg, #0D7CC1 0%, #084c77 100%);
 
   /* Semantic Status */
   --status-applied:      #60a5fa;
   --status-screening:    #fbbf24;
   --status-interviewing: #c084fc;
   --status-offered:      #34d399;
-  --status-hired:        #A3E635;
+  --status-hired:        #0D7CC1;
   --status-rejected:     #f87171;
 
   /* Text Scale */
-  --text-primary:   rgba(255, 255, 255, 0.95); /* Near white (95% opacity) primary text */
-  --text-secondary: rgba(255, 255, 255, 0.7);  /* Highly visible (70% opacity) secondary text */
-  --text-muted:     rgba(255, 255, 255, 0.45); /* Clear, legible (45% opacity) muted labels */
-  --text-inverse:   #09090b;
+  --text-primary:   #000000; /* Black Headings/Text */
+  --text-secondary: #333333;
+  --text-muted:     #777777;
+  --text-inverse:   #FFFFFF;
 
   /* Danger */
-  --danger:         #ff453a; /* iOS Red */
+  --danger:         #ff453a;
   --danger-dim:     rgba(255, 69, 58, 0.1);
 
   /* Layout */
-  --radius:         12px;  /* Curvature for inputs, pills and inner elements */
-  --radius-lg:      24px;  /* Continuous 24px continuous curves for cards and blocks */
+  --radius:         12px;
+  --radius-lg:      24px;
 
-  /* Shadows and Highlights */
-  --shadow:         0 16px 40px 0 rgba(0, 0, 0, 0.4);
-  --shadow-inset:   inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  /* Softer shadows for light mode */
+  --shadow:         0 8px 30px rgba(0, 0, 0, 0.05);
+  --shadow-inset:   inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
 
   /* Typography */
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* Motion */
-  --ease: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); /* Apple-like cubic-bezier ease out */
+  --ease: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ============================================
@@ -83,8 +83,8 @@ body {
    ============================================ */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #444; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #b8b8b8; }
 
 /* ============================================
    LAYOUT
@@ -102,10 +102,10 @@ body {
   width: calc(100% - 2.5rem);
   max-width: 1200px;
   height: 64px;
-  background: rgba(26, 26, 32, 0.82);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid #D9D9D9;
   box-shadow: var(--shadow), var(--shadow-inset);
   border-radius: 9999px; /* Pill layout shape */
   display: flex;
@@ -159,13 +159,13 @@ body {
 
 .sidebar-link:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .sidebar-link.active {
   color: var(--accent);
   background: var(--accent-dim);
-  border-color: rgba(163, 230, 53, 0.15);
+  border-color: rgba(13, 124, 193, 0.15);
 }
 
 .sidebar-link.active svg {
@@ -266,7 +266,7 @@ body {
 }
 
 .glass-card:hover {
-  border-color: #3a3a3a;
+  border-color: #b5b5b5;
 }
 
 /* ============================================
@@ -314,7 +314,7 @@ body {
 }
 
 /* KPI Icon colors */
-.kpi-blue      { color: #60a5fa; }
+.kpi-blue      { color: #0D7CC1; }
 .kpi-purple    { color: #c084fc; }
 .kpi-emerald   { color: #34d399; }
 .kpi-rose      { color: var(--danger); }
@@ -351,7 +351,7 @@ body {
 }
 
 .form-input::placeholder {
-  color: var(--text-muted);
+  color: #CFCFCF;
 }
 
 .form-input:focus {
@@ -392,8 +392,21 @@ body {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #b5f033;
+  background: #0b68a3;
   box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* Orange/Gold buttons for CTA actions (Search, Login CTA, Get Started) */
+.btn-cta, .login-card .btn-primary {
+  background: #F5A623 !important;
+  color: #FFFFFF !important;
+  border-color: #F5A623 !important;
+}
+
+.btn-cta:hover:not(:disabled), .login-card .btn-primary:hover:not(:disabled) {
+  background: #e0941b !important;
+  border-color: #e0941b !important;
+  box-shadow: 0 0 12px rgba(245, 166, 35, 0.3) !important;
 }
 
 .btn-secondary {
@@ -403,8 +416,8 @@ body {
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #2e2e2e;
-  border-color: #3e3e3e;
+  background: #e8e8e8;
+  border-color: #ccc;
   color: var(--text-primary);
 }
 
@@ -436,7 +449,7 @@ body {
 .badge-screening    { background: rgba(251, 191, 36, 0.1);  color: #fbbf24;  border: 1px solid rgba(251, 191, 36, 0.2); }
 .badge-interviewing { background: rgba(192, 132, 252, 0.1); color: #c084fc;  border: 1px solid rgba(192, 132, 252, 0.2); }
 .badge-offered      { background: rgba(52, 211, 153, 0.1);  color: #34d399;  border: 1px solid rgba(52, 211, 153, 0.2); }
-.badge-hired        { background: var(--accent-dim);         color: var(--accent); border: 1px solid rgba(163, 230, 53, 0.3); }
+.badge-hired        { background: var(--accent-dim);         color: var(--accent); border: 1px solid rgba(13, 124, 193, 0.3); }
 .badge-rejected     { background: rgba(248, 113, 113, 0.1); color: #f87171;  border: 1px solid rgba(248, 113, 113, 0.2); }
 
 /* ============================================

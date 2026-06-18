@@ -82,7 +82,7 @@ export default function Sidebar() {
           height: '32px',
           borderRadius: '50%',
           background: 'var(--accent-dim)',
-          border: '1px solid rgba(163, 230, 53, 0.25)',
+          border: '1px solid rgba(13, 124, 193, 0.25)',
           color: 'var(--accent)',
           display: 'flex',
           alignItems: 'center',
