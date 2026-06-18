@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
 const runTests = async () => {
   console.log('--- STARTING CRDMS BACKEND INTEGRATION TESTS (EMAIL AUTH & USER EDIT) ---');
