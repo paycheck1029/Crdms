@@ -222,25 +222,33 @@ export default function ReportsPage() {
                 </tr>
               </thead>
               <tbody>
-                {statusCounts.map(s => {
-                  const percent = expStats.totalCandidates > 0 ? (s.count / expStats.totalCandidates) * 100 : 0;
-                  return (
-                    <tr key={s.status}>
-                      <td style={{ fontWeight: '600' }}>
-                        <span className={`badge badge-${s.status.toLowerCase()}`}>{s.status}</span>
-                      </td>
-                      <td>{s.count} candidates</td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <div style={{ width: '80px', height: '6px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: `${percent}%`, height: '100%', background: 'var(--accent-gradient)' }} />
+                {[...statusCounts]
+                  .sort((a, b) => {
+                    const FUNNEL_ORDER = ['Applied', 'Screening', 'Interviewing', 'Offered', 'Hired', 'Rejected'];
+                    const idxA = FUNNEL_ORDER.indexOf(a.status);
+                    const idxB = FUNNEL_ORDER.indexOf(b.status);
+                    return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+                  })
+                  .map(s => {
+                    const percent = expStats.totalCandidates > 0 ? (s.count / expStats.totalCandidates) * 100 : 0;
+                    const displayPercent = (percent > 0 && percent < 1) ? '< 1' : Math.round(percent);
+                    return (
+                      <tr key={s.status}>
+                        <td style={{ fontWeight: '600' }}>
+                          <span className={`badge badge-${s.status.toLowerCase()}`}>{s.status}</span>
+                        </td>
+                        <td>{s.count} candidates</td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{ width: '80px', height: '6px', background: 'var(--bg-surface-dim)', borderRadius: '3px', overflow: 'hidden' }}>
+                              <div style={{ width: `${percent}%`, minWidth: s.count > 0 ? '6px' : '0', height: '100%', background: 'var(--accent-gradient)' }} />
+                            </div>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{displayPercent}%</span>
                           </div>
-                          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{Math.round(percent)}%</span>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
@@ -265,16 +273,17 @@ export default function ReportsPage() {
               <tbody>
                 {locationCounts.map(l => {
                   const percent = expStats.totalCandidates > 0 ? (l.count / expStats.totalCandidates) * 100 : 0;
+                  const displayPercent = (percent > 0 && percent < 1) ? '< 1' : Math.round(percent);
                   return (
                     <tr key={l.location}>
                       <td style={{ fontWeight: '600' }}>{l.location}</td>
                       <td>{l.count} candidates</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <div style={{ width: '80px', height: '6px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: `${percent}%`, height: '100%', background: 'var(--accent-gradient)' }} />
+                          <div style={{ width: '80px', height: '6px', background: 'var(--bg-surface-dim)', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: `${percent}%`, minWidth: l.count > 0 ? '6px' : '0', height: '100%', background: 'var(--accent-gradient)' }} />
                           </div>
-                          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{Math.round(percent)}%</span>
+                          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{displayPercent}%</span>
                         </div>
                       </td>
                     </tr>

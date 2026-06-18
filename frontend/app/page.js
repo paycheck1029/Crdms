@@ -178,44 +178,53 @@ export default function DashboardPage() {
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No candidate data available to construct funnel.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                {statusCounts.map((s) => {
-                  const percent = totalCandidates > 0 ? (s.count / totalCandidates) * 100 : 0;
-                  
-                  // Pick colors based on status
-                  let colorClass = 'badge-applied';
-                  if (s.status === 'Screening') colorClass = 'badge-screening';
-                  if (s.status === 'Interviewing') colorClass = 'badge-interviewing';
-                  if (s.status === 'Offered') colorClass = 'badge-offered';
-                  if (s.status === 'Hired') colorClass = 'badge-hired';
-                  if (s.status === 'Rejected') colorClass = 'badge-rejected';
+                {[...statusCounts]
+                  .sort((a, b) => {
+                    const FUNNEL_ORDER = ['Applied', 'Screening', 'Interviewing', 'Offered', 'Hired', 'Rejected'];
+                    const idxA = FUNNEL_ORDER.indexOf(a.status);
+                    const idxB = FUNNEL_ORDER.indexOf(b.status);
+                    return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+                  })
+                  .map((s) => {
+                    const percent = totalCandidates > 0 ? (s.count / totalCandidates) * 100 : 0;
+                    const displayPercent = (percent > 0 && percent < 1) ? '< 1' : Math.round(percent);
+                    
+                    // Pick colors based on status
+                    let colorClass = 'badge-applied';
+                    if (s.status === 'Screening') colorClass = 'badge-screening';
+                    if (s.status === 'Interviewing') colorClass = 'badge-interviewing';
+                    if (s.status === 'Offered') colorClass = 'badge-offered';
+                    if (s.status === 'Hired') colorClass = 'badge-hired';
+                    if (s.status === 'Rejected') colorClass = 'badge-rejected';
 
-                  return (
-                    <div key={s.status}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
-                        <span className={`badge ${colorClass}`}>{s.status}</span>
-                        <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
-                          {s.count} candidates ({Math.round(percent)}%)
-                        </span>
-                      </div>
-                      <div style={{ 
-                        width: '100%', 
-                        height: '8px', 
-                        background: 'rgba(255, 255, 255, 0.05)', 
-                        borderRadius: '4px',
-                        overflow: 'hidden'
-                      }}>
+                    return (
+                      <div key={s.status}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                          <span className={`badge ${colorClass}`}>{s.status}</span>
+                          <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+                            {s.count} candidates ({displayPercent}%)
+                          </span>
+                        </div>
                         <div style={{ 
-                          width: `${percent}%`, 
-                          height: '100%', 
-                          background: 'linear-gradient(90deg, var(--accent) 0%, #689916 100%)',
+                          width: '100%', 
+                          height: '8px', 
+                          background: 'var(--bg-surface-dim)', 
                           borderRadius: '4px',
-                          boxShadow: '0 0 10px var(--accent-glow)',
-                          transition: 'width 1s ease-out'
-                        }} />
+                          overflow: 'hidden'
+                        }}>
+                          <div style={{ 
+                            width: `${percent}%`, 
+                            minWidth: s.count > 0 ? '6px' : '0',
+                            height: '100%', 
+                            background: 'linear-gradient(90deg, var(--accent) 0%, #689916 100%)',
+                            borderRadius: '4px',
+                            boxShadow: '0 0 10px var(--accent-glow)',
+                            transition: 'width 1s ease-out'
+                          }} />
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             )}
           </div>
