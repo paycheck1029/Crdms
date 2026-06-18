@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -9,8 +10,7 @@ import {
   Users,
   BarChart3,
   ShieldAlert,
-  LogOut,
-  Zap
+  LogOut
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -49,7 +49,13 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <Zap size={18} />
+        <Image
+          src="/logo.avif"
+          alt="Paycheck Alpha Logo"
+          width={22}
+          height={22}
+          style={{ objectFit: 'contain' }}
+        />
         <span>Paycheck Alpha</span>
       </div>
 

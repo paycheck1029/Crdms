@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
-import { KeyRound, Mail, Sparkles } from 'lucide-react';
+import { KeyRound, Mail } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -32,10 +33,14 @@ export default function LoginPage() {
   return (
     <div className="login-container">
       <div className="glass-card login-card">
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-          <div className="kpi-icon-wrapper kpi-cyan">
-            <Sparkles size={28} />
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+          <Image
+            src="/logo.avif"
+            alt="Paycheck Alpha Logo"
+            width={56}
+            height={56}
+            style={{ objectFit: 'contain' }}
+          />
         </div>
         
         <h1 className="login-logo">CRDMS Portal</h1>
