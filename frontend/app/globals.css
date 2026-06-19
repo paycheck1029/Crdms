@@ -38,6 +38,15 @@
   --text-muted:     #777777;
   --text-inverse:   #FFFFFF;
 
+  /* Success / Emerald Accents */
+  --success:             #34d399;                  /* Aligns with --status-offered */
+  --success-dim:         rgba(52, 211, 153, 0.08); /* Background overlay */
+  --success-border:      rgba(52, 211, 153, 0.3);  /* Unified success border */
+
+  /* Consolidated Border Tokens */
+  --accent-border-soft:  rgba(13, 124, 193, 0.2);  /* Consolidated active tabs/badges borders */
+  --danger-border:       rgba(255, 69, 58, 0.3);   /* Unified danger border */
+
   /* Danger */
   --danger:         #ff453a;
   --danger-dim:     rgba(255, 69, 58, 0.1);
@@ -454,7 +463,7 @@ body {
 .badge-screening    { background: rgba(251, 191, 36, 0.1);  color: #fbbf24;  border: 1px solid rgba(251, 191, 36, 0.2); }
 .badge-interviewing { background: rgba(192, 132, 252, 0.1); color: #c084fc;  border: 1px solid rgba(192, 132, 252, 0.2); }
 .badge-offered      { background: rgba(52, 211, 153, 0.1);  color: #34d399;  border: 1px solid rgba(52, 211, 153, 0.2); }
-.badge-hired        { background: var(--accent-dim);         color: var(--accent); border: 1px solid rgba(13, 124, 193, 0.3); }
+.badge-hired        { background: var(--accent-dim);         color: var(--accent); border: 1px solid var(--accent-border-soft); }
 .badge-rejected     { background: rgba(248, 113, 113, 0.1); color: #f87171;  border: 1px solid rgba(248, 113, 113, 0.2); }
 
 /* ============================================

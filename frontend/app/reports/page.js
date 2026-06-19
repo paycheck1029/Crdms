@@ -144,11 +144,11 @@ export default function ReportsPage() {
 
       {error && (
         <div style={{ 
-          background: 'rgba(239, 68, 68, 0.1)', 
-          border: '1px solid rgba(239, 68, 68, 0.3)',
+          background: 'var(--danger-dim)', 
+          border: '1px solid var(--danger-border)',
           borderRadius: '8px', 
           padding: '1rem', 
-          color: 'var(--accent-rose)',
+          color: 'var(--danger)',
           marginBottom: '2rem',
           display: 'flex',
           alignItems: 'center',
@@ -306,8 +306,8 @@ export default function ReportsPage() {
               <div 
                 key={skill.name} 
                 style={{ 
-                  background: 'rgba(255, 255, 255, 0.02)', 
-                  border: '1px solid var(--border-glass)',
+                  background: 'var(--bg-surface-dim)', 
+                  border: '1px solid var(--border)',
                   padding: '1rem', 
                   borderRadius: '8px',
                   display: 'flex',

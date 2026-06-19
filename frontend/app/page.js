@@ -216,7 +216,7 @@ export default function DashboardPage() {
                             width: `${percent}%`, 
                             minWidth: s.count > 0 ? '6px' : '0',
                             height: '100%', 
-                            background: 'linear-gradient(90deg, var(--accent) 0%, #689916 100%)',
+                            background: 'linear-gradient(90deg, var(--accent) 0%, var(--status-offered) 100%)',
                             borderRadius: '4px',
                             boxShadow: '0 0 10px var(--accent-glow)',
                             transition: 'width 1s ease-out'
@@ -247,7 +247,7 @@ export default function DashboardPage() {
                       <span style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         <span style={{ color: 'var(--text-muted)' }}>{idx + 1}.</span> {loc.location}
                       </span>
-                      <span style={{ fontWeight: '600', color: 'var(--accent-cyan)' }}>{loc.count} profiles</span>
+                      <span style={{ fontWeight: '600', color: 'var(--accent)' }}>{loc.count} profiles</span>
                     </li>
                   ))}
                 </ul>
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                     <span 
                       key={skill.name} 
                       style={{ 
-                        background: 'rgba(255, 255, 255, 0.03)', 
+                        background: 'var(--bg-surface-dim)', 
                         border: '1px solid var(--border)',
                         borderRadius: 'var(--radius)',
                         padding: '0.35rem 0.6rem',
@@ -276,7 +276,7 @@ export default function DashboardPage() {
                         color: 'var(--text-primary)'
                       }}
                     >
-                      {skill.name} <strong style={{ color: 'var(--accent-purple)' }}>({skill.count})</strong>
+                      {skill.name} <strong style={{ color: 'var(--status-interviewing)' }}>({skill.count})</strong>
                     </span>
                   ))}
                 </div>
@@ -322,12 +322,12 @@ export default function DashboardPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {logs.map((log) => (
                   <div key={log.id} style={{ 
-                    borderBottom: '1px solid var(--border-glass)', 
+                    borderBottom: '1px solid var(--border)', 
                     paddingBottom: '0.75rem',
                     fontSize: '0.8rem'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-                      <strong style={{ color: 'var(--accent-cyan)' }}>@{log.username}</strong>
+                      <strong style={{ color: 'var(--accent)' }}>@{log.username}</strong>
                       <span style={{ color: 'var(--text-muted)' }}>
                         {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>

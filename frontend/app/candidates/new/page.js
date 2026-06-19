@@ -226,11 +226,11 @@ function CandidateFormContent() {
 
       {error && (
         <div style={{ 
-          background: 'rgba(239, 68, 68, 0.1)', 
-          border: '1px solid rgba(239, 68, 68, 0.3)',
+          background: 'var(--danger-dim)', 
+          border: '1px solid var(--danger-border)',
           borderRadius: '8px', 
           padding: '0.75rem 1rem', 
-          color: 'var(--accent-rose)',
+          color: 'var(--danger)',
           marginBottom: '1rem',
           display: 'flex',
           alignItems: 'center',
@@ -244,11 +244,11 @@ function CandidateFormContent() {
 
       {success && (
         <div style={{ 
-          background: 'rgba(16, 185, 129, 0.1)', 
-          border: '1px solid rgba(16, 185, 129, 0.3)',
+          background: 'var(--success-dim)', 
+          border: '1px solid var(--success-border)',
           borderRadius: '8px', 
           padding: '0.75rem 1rem', 
-          color: 'var(--accent-emerald)',
+          color: 'var(--success)',
           marginBottom: '1rem',
           display: 'flex',
           alignItems: 'center',
@@ -272,7 +272,7 @@ function CandidateFormContent() {
                 padding: '0.4rem 1.25rem',
                 border: 'none',
                 background: activeFormTab === 'personal' ? 'var(--accent-dim)' : 'transparent',
-                border: activeFormTab === 'personal' ? '1px solid rgba(163, 230, 53, 0.15)' : '1px solid transparent',
+                border: activeFormTab === 'personal' ? '1px solid var(--accent-border-soft)' : '1px solid transparent',
                 color: activeFormTab === 'personal' ? 'var(--accent)' : 'var(--text-secondary)',
                 borderRadius: '9999px',
                 fontSize: '0.8rem',
@@ -290,7 +290,7 @@ function CandidateFormContent() {
                 padding: '0.4rem 1.25rem',
                 border: 'none',
                 background: activeFormTab === 'compensation' ? 'var(--accent-dim)' : 'transparent',
-                border: activeFormTab === 'compensation' ? '1px solid rgba(163, 230, 53, 0.15)' : '1px solid transparent',
+                border: activeFormTab === 'compensation' ? '1px solid var(--accent-border-soft)' : '1px solid transparent',
                 color: activeFormTab === 'compensation' ? 'var(--accent)' : 'var(--text-secondary)',
                 borderRadius: '9999px',
                 fontSize: '0.8rem',
@@ -308,7 +308,7 @@ function CandidateFormContent() {
                 padding: '0.4rem 1.25rem',
                 border: 'none',
                 background: activeFormTab === 'resume' ? 'var(--accent-dim)' : 'transparent',
-                border: activeFormTab === 'resume' ? '1px solid rgba(163, 230, 53, 0.15)' : '1px solid transparent',
+                border: activeFormTab === 'resume' ? '1px solid var(--accent-border-soft)' : '1px solid transparent',
                 color: activeFormTab === 'resume' ? 'var(--accent)' : 'var(--text-secondary)',
                 borderRadius: '9999px',
                 fontSize: '0.8rem',
@@ -420,7 +420,7 @@ function CandidateFormContent() {
               <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Current Status *</label>
               <select
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', appearance: 'none', background: 'rgba(255, 255, 255, 0.04)' }}
+                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', appearance: 'none' }}
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               >
@@ -535,7 +535,7 @@ function CandidateFormContent() {
                         </>
                       )}
                       {uploadSuccess && (
-                        <span style={{ fontSize: '0.7rem', color: 'var(--accent-emerald)', marginTop: '0.25rem' }}>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--success)', marginTop: '0.25rem' }}>
                           ✓ Uploaded.
                         </span>
                       )}
@@ -547,7 +547,7 @@ function CandidateFormContent() {
           </div>
 
           {/* Action buttons bar & Tab navigation indicators */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '0.85rem', marginTop: '0.85rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.85rem', marginTop: '0.85rem' }}>
             <div style={{ display: 'flex', gap: '0.35rem' }}>
               {activeFormTab !== 'personal' && (
                 <button

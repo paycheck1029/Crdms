@@ -38,8 +38,8 @@ const STATUS_STYLE_MAP = {
   Screening: { bg: 'rgba(251, 191, 36, 0.05)', border: '1px solid rgba(251, 191, 36, 0.2)', color: '#fbbf24' },
   Interview: { bg: 'rgba(192, 132, 252, 0.05)', border: '1px solid rgba(192, 132, 252, 0.2)', color: '#c084fc' },
   Interviewing: { bg: 'rgba(192, 132, 252, 0.05)', border: '1px solid rgba(192, 132, 252, 0.2)', color: '#c084fc' },
-  Offered: { bg: 'rgba(251, 191, 36, 0.05)', border: '1px solid rgba(251, 191, 36, 0.2)', color: '#fbbf24' }, // Yellow/Orange in reference screen
-  Hired: { bg: 'rgba(163, 230, 53, 0.05)', border: '1px solid rgba(163, 230, 53, 0.25)', color: '#A3E635' },
+  Offered: { bg: 'rgba(52, 211, 153, 0.05)', border: '1px solid rgba(52, 211, 153, 0.2)', color: 'var(--success)' }, // Aligned offered green badge
+  Hired: { bg: 'var(--accent-dim)', border: '1px solid var(--accent-border-soft)', color: 'var(--status-hired)' },
   Rejected: { bg: 'rgba(248, 113, 113, 0.05)', border: '1px solid rgba(248, 113, 113, 0.2)', color: '#f87171' }
 };
 
@@ -57,7 +57,7 @@ const getAvatarColor = (name) => {
     { bg: 'rgba(52, 211, 153, 0.08)', border: '1px solid rgba(52, 211, 153, 0.15)', fg: '#34d399' },
     { bg: 'rgba(251, 191, 36, 0.08)', border: '1px solid rgba(251, 191, 36, 0.15)', fg: '#fbbf24' },
     { bg: 'rgba(248, 113, 113, 0.08)', border: '1px solid rgba(248, 113, 113, 0.15)', fg: '#f87171' },
-    { bg: 'rgba(163, 230, 53, 0.08)', border: '1px solid rgba(163, 230, 53, 0.15)', fg: '#A3E635' }
+    { bg: 'rgba(245, 166, 35, 0.08)', border: '1px solid rgba(245, 166, 35, 0.15)', fg: '#F5A623' }
   ];
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
@@ -918,8 +918,8 @@ export default function CandidatesPage() {
         display: 'flex',
         alignItems: 'center',
         gap: '0.65rem',
-        background: 'rgba(163, 230, 53, 0.04)',
-        border: '1px solid rgba(163, 230, 53, 0.2)',
+        background: 'var(--accent-dim)',
+        border: '1px solid var(--accent-border-soft)',
         borderRadius: '8px',
         padding: '0.65rem 1rem',
         marginBottom: '1.25rem',
@@ -1031,7 +1031,7 @@ export default function CandidatesPage() {
         {loading && candidates.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '3rem 0' }}>Loading candidate directory details...</p>
         ) : error ? (
-          <p style={{ textAlign: 'center', color: 'var(--accent-rose)', padding: '3rem 0' }}>{error}</p>
+          <p style={{ textAlign: 'center', color: 'var(--danger)', padding: '3rem 0' }}>{error}</p>
         ) : candidates.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '3rem 0' }}>No matching candidates found.</p>
         ) : (
@@ -1343,15 +1343,15 @@ export default function CandidatesPage() {
               <X size={20} />
             </button>
             <div style={{ 
-              background: 'var(--accent-dim)',
-              border: '1px solid rgba(163, 230, 53, 0.2)',
+              background: 'var(--success-dim)',
+              border: '1px solid var(--success-border)',
               width: '56px', 
               height: '56px', 
               borderRadius: '50%', 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
-              color: 'var(--accent)',
+              color: 'var(--success)',
               margin: '0 auto 1.5rem auto'
             }}>
               <Download size={24} />
@@ -1411,8 +1411,8 @@ export default function CandidatesPage() {
               <X size={20} />
             </button>
             <div style={{ 
-              background: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid rgba(239, 68, 68, 0.2)',
+              background: 'var(--danger-dim)',
+              border: '1px solid var(--danger-border)',
               width: '56px', 
               height: '56px', 
               borderRadius: '50%', 
@@ -1484,8 +1484,8 @@ export default function CandidatesPage() {
 
             {formError && (
               <div style={{ 
-                background: 'rgba(239, 68, 68, 0.1)', 
-                border: '1px solid rgba(239, 68, 68, 0.3)',
+                background: 'var(--danger-dim)', 
+                border: '1px solid var(--danger-border)',
                 borderRadius: '8px', 
                 padding: '0.75rem 1rem', 
                 color: 'var(--danger)',
@@ -1502,11 +1502,11 @@ export default function CandidatesPage() {
 
             {formSuccess && (
               <div style={{ 
-                background: 'rgba(16, 185, 129, 0.1)', 
-                border: '1px solid rgba(16, 185, 129, 0.3)',
+                background: 'var(--success-dim)', 
+                border: '1px solid var(--success-border)',
                 borderRadius: '8px', 
                 padding: '0.75rem 1rem', 
-                color: 'var(--accent)',
+                color: 'var(--success)',
                 marginBottom: '1rem',
                 display: 'flex',
                 alignItems: 'center',
@@ -1528,7 +1528,7 @@ export default function CandidatesPage() {
                     padding: '0.4rem 1.25rem',
                     border: 'none',
                     background: activeFormTab === 'personal' ? 'var(--accent-dim)' : 'transparent',
-                    border: activeFormTab === 'personal' ? '1px solid rgba(163, 230, 53, 0.15)' : '1px solid transparent',
+                    border: activeFormTab === 'personal' ? '1px solid var(--accent-border-soft)' : '1px solid transparent',
                     color: activeFormTab === 'personal' ? 'var(--accent)' : 'var(--text-secondary)',
                     borderRadius: '9999px',
                     fontSize: '0.8rem',
@@ -1546,7 +1546,7 @@ export default function CandidatesPage() {
                     padding: '0.4rem 1.25rem',
                     border: 'none',
                     background: activeFormTab === 'compensation' ? 'var(--accent-dim)' : 'transparent',
-                    border: activeFormTab === 'compensation' ? '1px solid rgba(163, 230, 53, 0.15)' : '1px solid transparent',
+                    border: activeFormTab === 'compensation' ? '1px solid var(--accent-border-soft)' : '1px solid transparent',
                     color: activeFormTab === 'compensation' ? 'var(--accent)' : 'var(--text-secondary)',
                     borderRadius: '9999px',
                     fontSize: '0.8rem',
@@ -1564,7 +1564,7 @@ export default function CandidatesPage() {
                     padding: '0.4rem 1.25rem',
                     border: 'none',
                     background: activeFormTab === 'resume' ? 'var(--accent-dim)' : 'transparent',
-                    border: activeFormTab === 'resume' ? '1px solid rgba(163, 230, 53, 0.15)' : '1px solid transparent',
+                    border: activeFormTab === 'resume' ? '1px solid var(--accent-border-soft)' : '1px solid transparent',
                     color: activeFormTab === 'resume' ? 'var(--accent)' : 'var(--text-secondary)',
                     borderRadius: '9999px',
                     fontSize: '0.8rem',
@@ -1676,7 +1676,7 @@ export default function CandidatesPage() {
                   <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Current Status *</label>
                   <select
                     className="form-input"
-                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', appearance: 'none', background: 'rgba(255, 255, 255, 0.04)' }}
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', appearance: 'none' }}
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
                   >
@@ -1791,7 +1791,7 @@ export default function CandidatesPage() {
                             </>
                           )}
                           {uploadSuccess && (
-                            <span style={{ fontSize: '0.7rem', color: 'var(--accent-emerald)', marginTop: '0.25rem' }}>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--success)', marginTop: '0.25rem' }}>
                               ✓ Uploaded.
                             </span>
                           )}
@@ -1803,7 +1803,7 @@ export default function CandidatesPage() {
               </div>
 
               {/* Action buttons bar */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '0.85rem', marginTop: '0.85rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.85rem', marginTop: '0.85rem' }}>
                 <div style={{ display: 'flex', gap: '0.35rem' }}>
                   {activeFormTab !== 'personal' && (
                     <button
@@ -1956,8 +1956,8 @@ export default function CandidatesPage() {
 
         /* Skill Badge capsule custom styles matching screen */
         .skill-badge {
-          background-color: rgba(163, 230, 53, 0.04);
-          border: 1px solid rgba(163, 230, 53, 0.2);
+          background-color: var(--accent-dim);
+          border: 1px solid var(--accent-border-soft);
           border-radius: 9999px; /* Pill layout */
           color: var(--accent);
           padding: 0.2rem 0.65rem;
@@ -2044,7 +2044,7 @@ export default function CandidatesPage() {
           margin: 0 auto 1.5rem auto;
           width: 40px;
           height: 40px;
-          border: 4px solid rgba(255, 255, 255, 0.1);
+          border: 4px solid var(--border-subtle);
           border-top: 4px solid var(--accent);
           border-radius: 50%;
           animation: spin 1s linear infinite;

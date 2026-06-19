@@ -56,11 +56,11 @@ export default function LoginPage() {
 
         {error && (
           <div style={{ 
-            background: 'rgba(244, 63, 94, 0.1)', 
-            border: '1px solid rgba(244, 63, 94, 0.3)',
+            background: 'var(--danger-dim)', 
+            border: '1px solid var(--danger-border)',
             borderRadius: '6px',
             padding: '0.75rem',
-            color: 'var(--accent-rose)',
+            color: 'var(--danger)',
             fontSize: '0.85rem',
             marginBottom: '1.25rem',
             textAlign: 'center'
@@ -130,7 +130,7 @@ export default function LoginPage() {
 
         <div style={{ 
           marginTop: '2rem', 
-          borderTop: '1px solid var(--border-glass)',
+          borderTop: '1px solid var(--border)',
           paddingTop: '1.25rem',
           textAlign: 'center'
         }}>

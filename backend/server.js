@@ -902,7 +902,7 @@ const init = async () => {
   try {
     await initDB();
     app.listen(PORT, () => {
-      console.log(`Backend Express server is running on http://localhost:${PORT}`);
+      console.log(`Backend Express server is running on port ${PORT}`);
     });
   } catch (err) {
     console.error('Failed to initialize database schema:', err);

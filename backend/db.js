@@ -4,11 +4,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const dbConfig = {
-  host: process.env.DB_HOST || '127.0.0.1',
-  port: parseInt(process.env.DB_PORT || '3306'),
+  host: process.env.DB_HOST || 'crossover.proxy.rlwy.net',
+  port: parseInt(process.env.DB_PORT || '48934'),
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'crdms',
+  password: process.env.DB_PASSWORD || 'DqpyKcVvShnbkRkBBGkBZIJsrPHpZdEd',
+  database: process.env.DB_NAME || 'railway',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0

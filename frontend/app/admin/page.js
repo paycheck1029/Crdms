@@ -271,11 +271,11 @@ export default function AdminPanelPage() {
 
       {error && (
         <div style={{ 
-          background: 'rgba(239, 68, 68, 0.1)', 
-          border: '1px solid rgba(239, 68, 68, 0.3)',
+          background: 'var(--danger-dim)', 
+          border: '1px solid var(--danger-border)',
           borderRadius: '8px', 
           padding: '1rem', 
-          color: 'var(--accent-rose)',
+          color: 'var(--danger)',
           marginBottom: '1.5rem',
           display: 'flex',
           alignItems: 'center',
@@ -288,11 +288,11 @@ export default function AdminPanelPage() {
 
       {success && (
         <div style={{ 
-          background: 'rgba(16, 185, 129, 0.1)', 
-          border: '1px solid rgba(16, 185, 129, 0.3)',
+          background: 'var(--success-dim)', 
+          border: '1px solid var(--success-border)',
           borderRadius: '8px', 
           padding: '1rem', 
-          color: 'var(--accent-emerald)',
+          color: 'var(--success)',
           marginBottom: '1.5rem',
           display: 'flex',
           alignItems: 'center',
@@ -352,7 +352,7 @@ export default function AdminPanelPage() {
                   <tbody>
                     {usersList.map(u => (
                       <tr key={u.id} style={{ 
-                        background: editingUser && editingUser.id === u.id ? 'rgba(6, 182, 212, 0.05)' : 'transparent',
+                        background: editingUser && editingUser.id === u.id ? 'var(--accent-dim)' : 'transparent',
                         transition: 'background 0.3s'
                       }}>
                         <td style={{ fontWeight: '600', color: 'var(--text-primary)' }}>@{u.username}</td>
@@ -362,7 +362,7 @@ export default function AdminPanelPage() {
                             style={{ 
                               fontSize: '0.75rem', 
                               fontWeight: '700', 
-                              color: u.role === 'Admin' ? 'var(--accent-cyan)' : 'var(--text-secondary)'
+                              color: u.role === 'Admin' ? 'var(--accent)' : 'var(--text-secondary)'
                             }}
                           >
                             {u.role}
@@ -374,17 +374,17 @@ export default function AdminPanelPage() {
                               className="btn btn-secondary" 
                               style={{ 
                                 padding: '0.4rem 0.6rem', 
-                                borderColor: editingUser && editingUser.id === u.id ? 'var(--accent-cyan)' : 'var(--border-glass)' 
+                                borderColor: editingUser && editingUser.id === u.id ? 'var(--accent-border-soft)' : 'var(--border)' 
                               }}
                               disabled={actionLoading}
                               title="Edit Details"
                               onClick={() => handleStartEdit(u)}
                             >
-                              <Edit3 size={14} style={{ color: editingUser && editingUser.id === u.id ? 'var(--accent-cyan)' : 'inherit' }} />
+                              <Edit3 size={14} style={{ color: editingUser && editingUser.id === u.id ? 'var(--accent)' : 'inherit' }} />
                             </button>
                             <button 
                               className="btn btn-secondary" 
-                              style={{ padding: '0.4rem 0.6rem', color: 'var(--accent-rose)' }}
+                              style={{ padding: '0.4rem 0.6rem', color: 'var(--danger)' }}
                               disabled={u.id === user.id || actionLoading}
                               title={u.id === user.id ? 'Self deletion blocked' : 'Delete Account'}
                               onClick={() => handleDeleteUser(u.id, u.username)}
@@ -458,7 +458,7 @@ export default function AdminPanelPage() {
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value)}
                   disabled={actionLoading}
-                  style={{ appearance: 'none', background: 'rgba(255, 255, 255, 0.04)' }}
+                  style={{ appearance: 'none' }}
                 >
                   <option value="Admin" style={{ background: 'var(--bg-panel-solid)' }}>Admin</option>
                   <option value="Recruitment Team" style={{ background: 'var(--bg-panel-solid)' }}>Recruitment Team</option>
@@ -543,7 +543,7 @@ export default function AdminPanelPage() {
                 <tbody>
                   {filteredLogs.map(l => (
                     <tr key={l.id}>
-                      <td style={{ fontWeight: '600', color: 'var(--accent-cyan)' }}>@{l.username}</td>
+                      <td style={{ fontWeight: '600', color: 'var(--accent)' }}>@{l.username}</td>
                       <td style={{ fontWeight: '700' }}>{l.action}</td>
                       <td style={{ color: 'var(--text-secondary)' }}>{l.details}</td>
                       <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>

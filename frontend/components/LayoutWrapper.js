@@ -25,7 +25,7 @@ export default function LayoutWrapper({ children }) {
         <div style={{
           width: '50px',
           height: '50px',
-          border: '3px solid rgba(255, 255, 255, 0.05)',
+          border: '3px solid rgba(255, 255, 255, 0.15)',
           borderTop: '3px solid #06b6d4',
           borderRadius: '50%',
           animation: 'spin 1s linear infinite',
