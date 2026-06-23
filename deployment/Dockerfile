@@ -7,13 +7,13 @@ RUN apk add --no-cache libc6-compat
 FROM base AS backend-deps
 WORKDIR /app/backend
 COPY backend/package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Stage 3: Frontend Dependencies
 FROM base AS frontend-deps
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm install
 
 # Stage 4: Frontend Builder
 FROM base AS frontend-builder
