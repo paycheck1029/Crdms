@@ -13,21 +13,21 @@ export const getPool = () => {
 // Raw Query execution: returns rows array
 export const query = async (sql, params = []) => {
   const connectionPool = getPool();
-  const [rows] = await connectionPool.execute(sql, params);
+  const [rows] = await connectionPool.query(sql, params);
   return rows;
 };
 
 // Get single record: returns single row or null
 export const queryGet = async (sql, params = []) => {
   const connectionPool = getPool();
-  const [rows] = await connectionPool.execute(sql, params);
+  const [rows] = await connectionPool.query(sql, params);
   return rows[0] || null;
 };
 
 // Run modifying query: returns insert ID and affected rows
 export const queryRun = async (sql, params = []) => {
   const connectionPool = getPool();
-  const [result] = await connectionPool.execute(sql, params);
+  const [result] = await connectionPool.query(sql, params);
   return {
     id: result.insertId || null,
     changes: result.affectedRows || 0
