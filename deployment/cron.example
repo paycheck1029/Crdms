@@ -1,0 +1,6 @@
+# CRDMS Backup Crontab configuration
+# Copy this content into your crontab config (crontab -e) on your VM/Server.
+
+# Enforce daily database backup execution at 2:00 AM (server local time)
+# retention and uploads are handled automatically inside backup.js based on BACKUP_RETENTION_DAYS.
+0 2 * * * /bin/bash /app/deployment/backup.sh >> /app/backend/logs/cron_backup.log 2>&1

@@ -2,72 +2,54 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { API_URL } from '@/config';
+import reportService from '@/services/reportService';
+import auditService from '@/services/auditService';
 import { 
   Users, 
   UserCheck, 
   Calendar, 
   MapPin, 
-  FileSpreadsheet, 
   Activity,
   Award,
-  AlertCircle
+  AlertCircle,
+  TrendingUp,
+  Briefcase
 } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { token, hasRole, logout } = useAuth();
+  const { hasRole, logout } = useAuth();
   const [reportData, setReportData] = useState(null);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (!token) return;
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch Reports
+      const reportsRes = await reportService.getReports();
+      setReportData(reportsRes.data);
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Fetch Reports
-        const reportsRes = await fetch(`${API_URL}/reports`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (reportsRes.status === 401 || reportsRes.status === 403) {
-          logout();
-          return;
-        }
-        
-        if (!reportsRes.ok) {
-          throw new Error('Failed to fetch dashboard reports');
-        }
-        
-        const reportsJson = await reportsRes.json();
-        setReportData(reportsJson);
-
-        // Fetch logs if Admin or IT Team
-        if (hasRole(['Admin', 'IT Team'])) {
-          const logsRes = await fetch(`${API_URL}/logs`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          if (logsRes.status === 401 || logsRes.status === 403) {
-            logout();
-            return;
-          }
-          if (logsRes.ok) {
-            const logsJson = await logsRes.ok ? await logsRes.json() : [];
-            setLogs(logsJson.slice(0, 5)); // Keep latest 5
-          }
-        }
-      } catch (err) {
-        console.error(err);
-        setError(err.message || 'An error occurred fetching dashboard data.');
-      } finally {
-        setLoading(false);
+      // Fetch logs if Admin or HR Manager
+      if (hasRole(['Admin', 'HR Manager', 'Recruiter'])) {
+        const logsRes = await auditService.listLogs({ limit: 5 });
+        setLogs(logsRes.data.logs);
       }
-    };
+    } catch (err) {
+      if (err.message === 'Session expired') {
+        logout();
+      } else {
+        setError(err.message || 'An error occurred fetching dashboard data.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-  }, [token]);
+  }, []);
 
   if (loading) {
     return (
@@ -78,22 +60,23 @@ export default function DashboardPage() {
   }
 
   // Fallbacks if data empty
-  const totalCandidates = reportData?.experienceStats?.totalCandidates || 0;
+  const kpis = reportData?.kpi || {
+    totalCandidates: 0,
+    todaysInterviews: 0,
+    pending: 0,
+    selected: 0,
+    rejected: 0,
+    offers: 0,
+    joining: 0
+  };
+
   const statusCounts = reportData?.statusCounts || [];
   const locationCounts = reportData?.locationCounts || [];
   const topSkills = reportData?.topSkills || [];
   const avgExp = reportData?.experienceStats?.avgExperience || 0;
-
-  // Extract counts for KPIs
-  const getCount = (status) => {
-    const found = statusCounts.find(s => s.status.toLowerCase() === status.toLowerCase());
-    return found ? found.count : 0;
-  };
-
-  const screeningCount = getCount('Screening');
-  const interviewingCount = getCount('Interviewing');
-  const offeredCount = getCount('Offered');
-  const hiredCount = getCount('Hired');
+  
+  // Trends
+  const monthlyTrends = reportData?.trends?.monthly || [];
 
   return (
     <div>
@@ -119,12 +102,13 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* KPI Tiles */}
-      <div className="kpi-grid">
+      {/* KPI Tiles (Phase 8 - Expanded Dashboard Cards) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+        
         <div className="glass-card kpi-card">
           <div className="kpi-details">
-            <h3>Total Database</h3>
-            <div className="kpi-val">{totalCandidates}</div>
+            <h3>Total Candidates</h3>
+            <div className="kpi-val">{kpis.totalCandidates}</div>
           </div>
           <div className="kpi-icon-wrapper kpi-cyan">
             <Users size={24} />
@@ -133,18 +117,28 @@ export default function DashboardPage() {
 
         <div className="glass-card kpi-card">
           <div className="kpi-details">
-            <h3>Screening & Interview</h3>
-            <div className="kpi-val">{screeningCount + interviewingCount}</div>
+            <h3>Today's Interviews</h3>
+            <div className="kpi-val">{kpis.todaysInterviews}</div>
           </div>
-          <div className="kpi-icon-wrapper kpi-purple">
+          <div className="kpi-icon-wrapper kpi-rose">
             <Calendar size={24} />
           </div>
         </div>
 
         <div className="glass-card kpi-card">
           <div className="kpi-details">
-            <h3>Offers Out</h3>
-            <div className="kpi-val">{offeredCount}</div>
+            <h3>Pending Screening</h3>
+            <div className="kpi-val">{kpis.pending}</div>
+          </div>
+          <div className="kpi-icon-wrapper kpi-purple">
+            <Briefcase size={24} />
+          </div>
+        </div>
+
+        <div className="glass-card kpi-card">
+          <div className="kpi-details">
+            <h3>Selected / Offers</h3>
+            <div className="kpi-val">{kpis.selected}</div>
           </div>
           <div className="kpi-icon-wrapper kpi-emerald">
             <Award size={24} />
@@ -153,13 +147,24 @@ export default function DashboardPage() {
 
         <div className="glass-card kpi-card">
           <div className="kpi-details">
-            <h3>Total Hired</h3>
-            <div className="kpi-val">{hiredCount}</div>
+            <h3>Rejected</h3>
+            <div className="kpi-val" style={{ color: 'var(--danger)' }}>{kpis.rejected}</div>
+          </div>
+          <div className="kpi-icon-wrapper kpi-rose" style={{ background: 'var(--danger-dim)', color: 'var(--danger)' }}>
+            <AlertCircle size={24} />
+          </div>
+        </div>
+
+        <div className="glass-card kpi-card">
+          <div className="kpi-details">
+            <h3>Joining / Hired</h3>
+            <div className="kpi-val">{kpis.joining}</div>
           </div>
           <div className="kpi-icon-wrapper kpi-blue">
             <UserCheck size={24} />
           </div>
         </div>
+
       </div>
 
       {/* Dashboard Analytics Grid */}
@@ -180,22 +185,24 @@ export default function DashboardPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 {[...statusCounts]
                   .sort((a, b) => {
-                    const FUNNEL_ORDER = ['Applied', 'Screening', 'Interviewing', 'Offered', 'Hired', 'Rejected'];
+                    const FUNNEL_ORDER = ['Applied', 'Screening', 'Interviewing', 'Offered', 'Hired', 'Rejected', 'Selected', 'Joining', 'Pending'];
                     const idxA = FUNNEL_ORDER.indexOf(a.status);
                     const idxB = FUNNEL_ORDER.indexOf(b.status);
                     return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
                   })
                   .map((s) => {
-                    const percent = totalCandidates > 0 ? (s.count / totalCandidates) * 100 : 0;
+                    const percent = kpis.totalCandidates > 0 ? (s.count / kpis.totalCandidates) * 100 : 0;
                     const displayPercent = (percent > 0 && percent < 1) ? '< 1' : Math.round(percent);
                     
-                    // Pick colors based on status
                     let colorClass = 'badge-applied';
                     if (s.status === 'Screening') colorClass = 'badge-screening';
                     if (s.status === 'Interviewing') colorClass = 'badge-interviewing';
                     if (s.status === 'Offered') colorClass = 'badge-offered';
                     if (s.status === 'Hired') colorClass = 'badge-hired';
                     if (s.status === 'Rejected') colorClass = 'badge-rejected';
+                    if (s.status === 'Selected') colorClass = 'badge-offered';
+                    if (s.status === 'Joining') colorClass = 'badge-interviewing';
+                    if (s.status === 'Pending') colorClass = 'badge-screening';
 
                     return (
                       <div key={s.status}>
@@ -303,14 +310,42 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {/* Recent Audits (Admin & IT Only) */}
+          {/* Monthly Registration Trends (Phase 8 - Dashboard Chart Data) */}
+          <div className="glass-card">
+            <h2 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <TrendingUp size={18} className="kpi-cyan" />
+              <span>Talent Registration Trends</span>
+            </h2>
+            {monthlyTrends.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No registration history recorded.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {monthlyTrends.map((trend) => {
+                  const maxVal = Math.max(...monthlyTrends.map(t => t.count), 1);
+                  const trendPercent = (trend.count / maxVal) * 100;
+                  
+                  return (
+                    <div key={trend.period} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.85rem' }}>
+                      <span style={{ width: '60px', color: 'var(--text-secondary)' }}>{trend.period}</span>
+                      <div style={{ flexGrow: 1, background: 'var(--bg-surface-dim)', height: '12px', borderRadius: '6px', overflow: 'hidden' }}>
+                        <div style={{ width: `${trendPercent}%`, background: 'var(--accent)', height: '100%', borderRadius: '6px' }} />
+                      </div>
+                      <span style={{ width: '30px', fontWeight: '700', textAlign: 'right', color: 'var(--text-primary)' }}>{trend.count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Recent Audits (Admin & HR Managers Only) */}
           <div className="glass-card" style={{ flexGrow: 1 }}>
             <h2 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Activity size={18} className="kpi-rose" />
               <span>System Audit Logs</span>
             </h2>
             
-            {!hasRole(['Admin', 'IT Team']) ? (
+            {!hasRole(['Admin', 'HR Manager', 'Recruiter']) ? (
               <div style={{ padding: '1.5rem 0', textAlign: 'center' }}>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>
                   Audit logs are restricted to IT Team and System Administrators.
@@ -327,7 +362,7 @@ export default function DashboardPage() {
                     fontSize: '0.8rem'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-                      <strong style={{ color: 'var(--accent)' }}>@{log.username}</strong>
+                      <strong style={{ color: 'var(--accent)' }}>@{log.username || 'system'}</strong>
                       <span style={{ color: 'var(--text-muted)' }}>
                         {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>

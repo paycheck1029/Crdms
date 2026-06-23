@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { API_URL } from '@/config';
+import reportService from '@/services/reportService';
+import candidateService from '@/services/candidateService';
 import { 
   BarChart3, 
   MapPin, 
@@ -14,28 +15,23 @@ import {
 } from 'lucide-react';
 
 export default function ReportsPage() {
-  const { token, logout } = useAuth();
+  const { logout } = useAuth();
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState('');
 
   const fetchReports = async () => {
-    if (!token) return;
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/reports`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.status === 401 || res.status === 403) {
-        logout();
-        return;
-      }
-      if (!res.ok) throw new Error('Failed to load reports analytical data');
-      const data = await res.json();
-      setReportData(data);
+      const res = await reportService.getReports();
+      setReportData(res.data);
     } catch (err) {
-      setError(err.message);
+      if (err.message === 'Session expired') {
+        logout();
+      } else {
+        setError(err.message || 'Failed to load reports analytical data');
+      }
     } finally {
       setLoading(false);
     }
@@ -43,24 +39,17 @@ export default function ReportsPage() {
 
   useEffect(() => {
     fetchReports();
-  }, [token]);
+  }, []);
 
   // Export to CSV Function
   const handleExportCSV = async () => {
-    if (!token) return;
     try {
       setExporting(true);
-      // Fetch all candidates
-      const res = await fetch(`${API_URL}/candidates`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.status === 401 || res.status === 403) {
-        logout();
-        return;
-      }
-      if (!res.ok) throw new Error('Failed to fetch candidate list for CSV export');
       
-      const candidates = await res.json();
+      // Fetch all candidates (limit 1000 for export safety)
+      const res = await candidateService.getCandidates({ limit: 1000 });
+      const candidates = res.data.candidates;
+      
       if (candidates.length === 0) {
         alert('No candidates available to export.');
         return;
@@ -106,7 +95,11 @@ export default function ReportsPage() {
       link.click();
       document.body.removeChild(link);
     } catch (err) {
-      alert(`Export failed: ${err.message}`);
+      if (err.message === 'Session expired') {
+        logout();
+      } else {
+        alert(`Export failed: ${err.message}`);
+      }
     } finally {
       setExporting(false);
     }
@@ -120,6 +113,7 @@ export default function ReportsPage() {
     );
   }
 
+  const kpis = reportData?.kpi || { totalCandidates: 0 };
   const statusCounts = reportData?.statusCounts || [];
   const locationCounts = reportData?.locationCounts || [];
   const topSkills = reportData?.topSkills || [];
@@ -194,7 +188,7 @@ export default function ReportsPage() {
         <div className="glass-card kpi-card">
           <div className="kpi-details">
             <h3>Total Database Size</h3>
-            <div className="kpi-val">{expStats.totalCandidates || 0} Profiles</div>
+            <div className="kpi-val">{kpis.totalCandidates || 0} Profiles</div>
           </div>
           <div className="kpi-icon-wrapper kpi-blue">
             <BarChart3 size={20} />
@@ -202,7 +196,7 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {/* Dynamic Breakdown Charts & Lists */}
+      {/* Breakdown Charts */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
         
         {/* Status Counts Breakdown */}
@@ -224,13 +218,13 @@ export default function ReportsPage() {
               <tbody>
                 {[...statusCounts]
                   .sort((a, b) => {
-                    const FUNNEL_ORDER = ['Applied', 'Screening', 'Interviewing', 'Offered', 'Hired', 'Rejected'];
+                    const FUNNEL_ORDER = ['Applied', 'Screening', 'Interviewing', 'Offered', 'Hired', 'Rejected', 'Selected', 'Joining', 'Pending'];
                     const idxA = FUNNEL_ORDER.indexOf(a.status);
                     const idxB = FUNNEL_ORDER.indexOf(b.status);
                     return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
                   })
                   .map(s => {
-                    const percent = expStats.totalCandidates > 0 ? (s.count / expStats.totalCandidates) * 100 : 0;
+                    const percent = kpis.totalCandidates > 0 ? (s.count / kpis.totalCandidates) * 100 : 0;
                     const displayPercent = (percent > 0 && percent < 1) ? '< 1' : Math.round(percent);
                     return (
                       <tr key={s.status}>
@@ -272,7 +266,7 @@ export default function ReportsPage() {
               </thead>
               <tbody>
                 {locationCounts.map(l => {
-                  const percent = expStats.totalCandidates > 0 ? (l.count / expStats.totalCandidates) * 100 : 0;
+                  const percent = kpis.totalCandidates > 0 ? (l.count / kpis.totalCandidates) * 100 : 0;
                   const displayPercent = (percent > 0 && percent < 1) ? '< 1' : Math.round(percent);
                   return (
                     <tr key={l.location}>

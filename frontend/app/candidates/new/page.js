@@ -3,14 +3,14 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { API_URL } from '@/config';
+import candidateService from '@/services/candidateService';
 import { ArrowLeft, Save, Upload, File, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 function CandidateFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
-  const { token, logout } = useAuth();
+  const { logout } = useAuth();
 
   // Form Field States
   const [activeFormTab, setActiveFormTab] = useState('personal'); // 'personal' | 'compensation' | 'resume'
@@ -42,21 +42,14 @@ function CandidateFormContent() {
 
   // Load candidate details if in edit mode
   useEffect(() => {
-    if (!editId || !token) return;
+    if (!editId) return;
 
     const loadCandidate = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_URL}/candidates/${editId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.status === 401 || response.status === 403) {
-          logout();
-          return;
-        }
-        if (!response.ok) throw new Error('Failed to retrieve candidate profile for editing');
+        const res = await candidateService.getCandidate(editId);
+        const data = res.data;
         
-        const data = await response.json();
         setName(data.name);
         setEmail(data.email);
         setPhone(data.phone || '');
@@ -73,14 +66,18 @@ function CandidateFormContent() {
         setRemarks(data.remarks || '');
         setComment(data.comment || '');
       } catch (err) {
-        setError(err.message);
+        if (err.message === 'Session expired') {
+          logout();
+        } else {
+          setError(err.message || 'Failed to retrieve candidate profile');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadCandidate();
-  }, [editId, token]);
+  }, [editId]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -131,7 +128,7 @@ function CandidateFormContent() {
         status,
         current_ctc: currentCtc ? parseFloat(currentCtc) : null,
         expected_ctc: expectedCtc ? parseFloat(expectedCtc) : null,
-        notice_period_days: noticePeriod ? parseInt(noticePeriod) : null,
+        notice_period_days: noticePeriod ? parseInt(noticePeriod, 10) : null,
         company,
         linkedin_url: linkedinUrl,
         preferred_location: preferredLocation,
@@ -139,58 +136,23 @@ function CandidateFormContent() {
         comment
       };
 
-      const url = editId 
-        ? `${API_URL}/candidates/${editId}` 
-        : `${API_URL}/candidates`;
-      
-      const method = editId ? 'PUT' : 'POST';
+      let activeCandidateId = editId;
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.status === 401 || response.status === 403) {
-        logout();
-        return;
+      if (editId) {
+        await candidateService.updateCandidate(editId, payload);
+      } else {
+        const res = await candidateService.createCandidate(payload);
+        activeCandidateId = res.data.id;
       }
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit candidate profile');
-      }
-
-      const activeCandidateId = editId || data.id;
 
       // Handle resume file upload if selected
       if (resumeFile && !uploadSuccess) {
-        const formData = new FormData();
-        formData.append('resume', resumeFile);
-        formData.append('candidate_id', activeCandidateId);
-
-        const uploadRes = await fetch(`${API_URL}/uploads`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          body: formData
-        });
-
-        if (uploadRes.status === 401 || uploadRes.status === 403) {
-          logout();
-          return;
+        try {
+          await candidateService.uploadResume(activeCandidateId, resumeFile);
+          setUploadSuccess(true);
+        } catch (uploadErr) {
+          throw new Error(`Profile saved, but file upload failed: ${uploadErr.message}`);
         }
-
-        if (!uploadRes.ok) {
-          const uploadData = await uploadRes.json();
-          throw new Error(`Profile saved, but upload failed: ${uploadData.error || 'Upload error'}`);
-        }
-        setUploadSuccess(true);
       }
 
       setSuccess(`Candidate profile successfully ${editId ? 'updated' : 'created'}!`);
@@ -201,7 +163,11 @@ function CandidateFormContent() {
       }, 1500);
 
     } catch (err) {
-      setError(err.message);
+      if (err.message === 'Session expired') {
+        logout();
+      } else {
+        setError(err.message || 'Failed to save candidate details');
+      }
     } finally {
       setLoading(false);
     }
@@ -430,6 +396,9 @@ function CandidateFormContent() {
                 <option value="Offered" style={{ background: 'var(--bg-panel-solid)' }}>Offered</option>
                 <option value="Hired" style={{ background: 'var(--bg-panel-solid)' }}>Hired</option>
                 <option value="Rejected" style={{ background: 'var(--bg-panel-solid)' }}>Rejected</option>
+                <option value="Selected" style={{ background: 'var(--bg-panel-solid)' }}>Selected</option>
+                <option value="Joining" style={{ background: 'var(--bg-panel-solid)' }}>Joining</option>
+                <option value="Pending" style={{ background: 'var(--bg-panel-solid)' }}>Pending</option>
               </select>
             </div>
             <div className="form-group" style={{ marginBottom: '0.4rem' }}>
@@ -505,7 +474,7 @@ function CandidateFormContent() {
               </div>
               <div>
                 <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-                  <label className="form-label" style={{ marginBottom: '0.3rem', fontSize: '0.7rem' }}>Resume Document (PDF/DOCX/TXT)</label>
+                  <label className="form-label" style={{ marginBottom: '0.3rem', fontSize: '0.7rem' }}>Resume Document (PDF/DOCX/TXT/JPG/PNG)</label>
                   <div 
                     className={`dropzone ${isDragActive ? 'active' : ''}`}
                     onDragOver={handleDragOver}
@@ -518,7 +487,7 @@ function CandidateFormContent() {
                       id="file-upload-input"
                       type="file"
                       style={{ display: 'none' }}
-                      accept=".pdf,.docx,.doc,.txt"
+                      accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png"
                       onChange={handleFileChange}
                     />
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
@@ -546,7 +515,7 @@ function CandidateFormContent() {
             </div>
           </div>
 
-          {/* Action buttons bar & Tab navigation indicators */}
+          {/* Action Buttons */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.85rem', marginTop: '0.85rem' }}>
             <div style={{ display: 'flex', gap: '0.35rem' }}>
               {activeFormTab !== 'personal' && (

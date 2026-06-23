@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: crdms-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-crdms}
+      MYSQL_USER: ${DB_USER:-crdms_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-crdms_password}
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
+      timeout: 5s
+      retries: 5
+      interval: 10s
+
+  backend:
+    build:
+      context: ../
+      dockerfile: deployment/Dockerfile
+      target: backend
+    container_name: crdms-backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      DB_HOST: db
+      DB_USER: ${DB_USER:-crdms_user}
+      DB_PASSWORD: ${DB_PASSWORD:-crdms_password}
+      DB_NAME: ${DB_NAME:-crdms}
+      DB_PORT: 3306
+      JWT_SECRET: ${JWT_SECRET:-supersecretjwtkeyforproductioncrdms}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-supersecretrefreshjwtkeyforproductioncrdms}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_SECURE: ${MAIL_SECURE:-false}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-CRDMS}
+      MAIL_FROM_EMAIL: ${MAIL_FROM_EMAIL}
+      GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
+      GCP_PROJECT_ID: ${GCP_PROJECT_ID}
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
+    volumes:
+      - backend_logs:/app/backend/logs
+      - backend_uploads:/app/backend/uploads
+    expose:
+      - "5000"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  frontend:
+    build:
+      context: ../
+      dockerfile: deployment/Dockerfile
+      target: frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost/api}
+    container_name: crdms-frontend
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost/api}
+    expose:
+      - "3000"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  nginx:
+    image: nginx:alpine
+    container_name: crdms-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+volumes:
+  db_data:
+  backend_logs:
+  backend_uploads:

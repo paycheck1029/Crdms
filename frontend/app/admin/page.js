@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { API_URL } from '@/config';
+import userService from '@/services/userService';
+import auditService from '@/services/auditService';
 import { 
-  ShieldAlert, 
   Users, 
   Activity, 
   UserPlus, 
@@ -17,10 +17,9 @@ import {
 } from 'lucide-react';
 
 export default function AdminPanelPage() {
-  const { token, user, hasRole, logout } = useAuth();
+  const { user, hasRole, logout } = useAuth();
   
   // Navigation Tabs: 'users' or 'logs'
-  // Default to 'logs' if user is IT Team (since they don't have user CRUD permission)
   const defaultTab = hasRole(['Admin']) ? 'users' : 'logs';
   const [activeTab, setActiveTab] = useState(defaultTab);
 
@@ -29,7 +28,7 @@ export default function AdminPanelPage() {
   const [newUsername, setNewUsername] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [newRole, setNewRole] = useState('Recruitment Team');
+  const [newRole, setNewRole] = useState('Recruiter');
   
   // Editing state
   const [editingUser, setEditingUser] = useState(null);
@@ -47,21 +46,17 @@ export default function AdminPanelPage() {
 
   // Fetch Users
   const fetchUsers = async () => {
-    if (!token || !hasRole(['Admin'])) return;
+    if (!hasRole(['Admin'])) return;
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/users`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.status === 401 || res.status === 403) {
-        logout();
-        return;
-      }
-      if (!res.ok) throw new Error('Failed to retrieve user accounts');
-      const data = await res.json();
-      setUsersList(data);
+      const res = await userService.getUsers();
+      setUsersList(res.data);
     } catch (err) {
-      setError(err.message);
+      if (err.message === 'Session expired') {
+        logout();
+      } else {
+        setError(err.message || 'Failed to retrieve user accounts');
+      }
     } finally {
       setLoading(false);
     }
@@ -69,21 +64,16 @@ export default function AdminPanelPage() {
 
   // Fetch Logs
   const fetchLogs = async () => {
-    if (!token || !hasRole(['Admin', 'IT Team'])) return;
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/logs`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.status === 401 || res.status === 403) {
-        logout();
-        return;
-      }
-      if (!res.ok) throw new Error('Failed to retrieve system audit logs');
-      const data = await res.json();
-      setLogsList(data);
+      const res = await auditService.listLogs({ limit: 100 });
+      setLogsList(res.data.logs);
     } catch (err) {
-      setError(err.message);
+      if (err.message === 'Session expired') {
+        logout();
+      } else {
+        setError(err.message || 'Failed to retrieve system audit logs');
+      }
     } finally {
       setLoading(false);
     }
@@ -97,7 +87,7 @@ export default function AdminPanelPage() {
     } else {
       fetchLogs();
     }
-  }, [activeTab, token]);
+  }, [activeTab]);
 
   // Handle Create User
   const handleCreateUser = async (e) => {
@@ -112,38 +102,23 @@ export default function AdminPanelPage() {
 
     setActionLoading(true);
     try {
-      const res = await fetch(`${API_URL}/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          username: newUsername,
-          email: newEmail,
-          password: newPassword,
-          role: newRole
-        })
+      await userService.createUser({
+        username: newUsername,
+        email: newEmail,
+        password: newPassword,
+        role: newRole
       });
-
-      if (res.status === 401 || res.status === 403) {
-        logout();
-        return;
-      }
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to create user');
 
       setSuccess(`User account "${newUsername}" successfully created.`);
       setNewUsername('');
       setNewEmail('');
       setNewPassword('');
-      setNewRole('Recruitment Team');
+      setNewRole('Recruiter');
       
       // Reload list
       fetchUsers();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Failed to create user');
     } finally {
       setActionLoading(false);
     }
@@ -166,7 +141,7 @@ export default function AdminPanelPage() {
     setNewUsername('');
     setNewEmail('');
     setNewPassword('');
-    setNewRole('Recruitment Team');
+    setNewRole('Recruiter');
     setError('');
     setSuccess('');
   };
@@ -184,32 +159,17 @@ export default function AdminPanelPage() {
 
     setActionLoading(true);
     try {
-      const res = await fetch(`${API_URL}/users/${editingUser.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          email: newEmail,
-          role: newRole,
-          password: newPassword || null // Send null to leave current password intact
-        })
+      await userService.updateUser(editingUser.id, {
+        email: newEmail,
+        role: newRole,
+        password: newPassword || null // Send null to leave current password intact
       });
-
-      if (res.status === 401 || res.status === 403) {
-        logout();
-        return;
-      }
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to update user details');
 
       setSuccess(`User account "${editingUser.username}" successfully updated.`);
       handleCancelEdit();
       fetchUsers();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Failed to update user details');
     } finally {
       setActionLoading(false);
     }
@@ -228,20 +188,7 @@ export default function AdminPanelPage() {
     setSuccess('');
     setActionLoading(true);
     try {
-      const res = await fetch(`${API_URL}/users/${targetUserId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (res.status === 401 || res.status === 403) {
-        logout();
-        return;
-      }
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to delete user');
-      }
+      await userService.deleteUser(targetUserId);
 
       setSuccess(`User "${targetUsername}" deleted.`);
       if (editingUser && editingUser.id === targetUserId) {
@@ -249,7 +196,7 @@ export default function AdminPanelPage() {
       }
       fetchUsers();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Failed to delete user');
     } finally {
       setActionLoading(false);
     }
@@ -257,8 +204,10 @@ export default function AdminPanelPage() {
 
   // Filter logs locally
   const filteredLogs = logsList.filter(log => {
-    const matchUser = log.username.toLowerCase().includes(searchLogUser.toLowerCase());
-    const matchAction = log.action.toLowerCase().includes(searchLogAction.toLowerCase());
+    const username = log.username || 'system';
+    const action = log.action || '';
+    const matchUser = username.toLowerCase().includes(searchLogUser.toLowerCase());
+    const matchAction = action.toLowerCase().includes(searchLogAction.toLowerCase());
     return matchUser && matchAction;
   });
 
@@ -385,8 +334,8 @@ export default function AdminPanelPage() {
                             <button 
                               className="btn btn-secondary" 
                               style={{ padding: '0.4rem 0.6rem', color: 'var(--danger)' }}
-                              disabled={u.id === user.id || actionLoading}
-                              title={u.id === user.id ? 'Self deletion blocked' : 'Delete Account'}
+                              disabled={u.id === user?.id || actionLoading}
+                              title={u.id === user?.id ? 'Self deletion blocked' : 'Delete Account'}
                               onClick={() => handleDeleteUser(u.id, u.username)}
                             >
                               <Trash2 size={14} />
@@ -461,9 +410,11 @@ export default function AdminPanelPage() {
                   style={{ appearance: 'none' }}
                 >
                   <option value="Admin" style={{ background: 'var(--bg-panel-solid)' }}>Admin</option>
-                  <option value="Recruitment Team" style={{ background: 'var(--bg-panel-solid)' }}>Recruitment Team</option>
-                  <option value="Management" style={{ background: 'var(--bg-panel-solid)' }}>Management</option>
-                  <option value="IT Team" style={{ background: 'var(--bg-panel-solid)' }}>IT Team</option>
+                  <option value="HR Manager" style={{ background: 'var(--bg-panel-solid)' }}>HR Manager</option>
+                  <option value="Recruiter" style={{ background: 'var(--bg-panel-solid)' }}>Recruiter</option>
+                  <option value="Interviewer" style={{ background: 'var(--bg-panel-solid)' }}>Interviewer</option>
+                  <option value="Data Entry" style={{ background: 'var(--bg-panel-solid)' }}>Data Entry</option>
+                  <option value="Viewer" style={{ background: 'var(--bg-panel-solid)' }}>Viewer</option>
                 </select>
               </div>
 
@@ -537,15 +488,21 @@ export default function AdminPanelPage() {
                     <th style={{ width: '120px' }}>User</th>
                     <th style={{ width: '140px' }}>Action</th>
                     <th>Audit Details</th>
+                    <th>IP Address</th>
+                    <th>System / Browser</th>
                     <th style={{ width: '180px' }}>Timestamp</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredLogs.map(l => (
                     <tr key={l.id}>
-                      <td style={{ fontWeight: '600', color: 'var(--accent)' }}>@{l.username}</td>
+                      <td style={{ fontWeight: '600', color: 'var(--accent)' }}>@{l.username || 'system'}</td>
                       <td style={{ fontWeight: '700' }}>{l.action}</td>
                       <td style={{ color: 'var(--text-secondary)' }}>{l.details}</td>
+                      <td style={{ fontSize: '0.8rem', fontFamily: 'monospace' }}>{l.ip_address}</td>
+                      <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                        {l.os} / {l.browser}
+                      </td>
                       <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                         {new Date(l.timestamp).toLocaleString()}
                       </td>
