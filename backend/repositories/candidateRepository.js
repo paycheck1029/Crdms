@@ -1,5 +1,17 @@
 import { query, queryGet, queryRun } from '../database/connection.js';
 
+const safeFloat = (val) => {
+  if (val === undefined || val === null || val === '') return null;
+  const parsed = parseFloat(val);
+  return isNaN(parsed) ? null : parsed;
+};
+
+const safeInt = (val) => {
+  if (val === undefined || val === null || val === '') return null;
+  const parsed = parseInt(val, 10);
+  return isNaN(parsed) ? null : parsed;
+};
+
 export const buildCandidateQuery = (params, onlyDeleted = false) => {
   let sql = 'SELECT * FROM Candidates WHERE ';
   sql += onlyDeleted ? 'deleted_at IS NOT NULL' : 'deleted_at IS NULL';
@@ -44,13 +56,19 @@ export const buildCandidateQuery = (params, onlyDeleted = false) => {
   }
 
   if (params.minExp !== undefined && params.minExp !== '') {
-    sql += ' AND experience_years >= ?';
-    queryParams.push(parseFloat(params.minExp));
+    const minExp = safeFloat(params.minExp);
+    if (minExp !== null) {
+      sql += ' AND experience_years >= ?';
+      queryParams.push(minExp);
+    }
   }
 
   if (params.maxExp !== undefined && params.maxExp !== '') {
-    sql += ' AND experience_years <= ?';
-    queryParams.push(parseFloat(params.maxExp));
+    const maxExp = safeFloat(params.maxExp);
+    if (maxExp !== null) {
+      sql += ' AND experience_years <= ?';
+      queryParams.push(maxExp);
+    }
   }
 
   if (params.skills) {
@@ -138,10 +156,10 @@ export const create = async (c) => {
      (name, email, phone, skills, location, experience_years, status, current_ctc, expected_ctc, notice_period_days, linkedin_url, company, preferred_location, remarks, comment)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
-      c.name, c.email, c.phone || null, c.skills, c.location, parseFloat(c.experience_years), c.status,
-      c.current_ctc ? parseFloat(c.current_ctc) : null,
-      c.expected_ctc ? parseFloat(c.expected_ctc) : null,
-      c.notice_period_days ? parseInt(c.notice_period_days, 10) : null,
+      c.name, c.email, c.phone || null, c.skills, c.location, safeFloat(c.experience_years), c.status,
+      safeFloat(c.current_ctc),
+      safeFloat(c.expected_ctc),
+      safeInt(c.notice_period_days),
       c.linkedin_url || null, c.company || null, c.preferred_location || null, c.remarks || null, c.comment || null
     ]
   );
@@ -169,11 +187,11 @@ export const update = async (id, c) => {
      WHERE id = ? AND deleted_at IS NULL`,
     [
       c.name, c.email, c.phone, c.skills, c.location,
-      c.experience_years !== undefined ? parseFloat(c.experience_years) : null,
+      c.experience_years !== undefined ? safeFloat(c.experience_years) : null,
       c.status,
-      c.current_ctc !== undefined ? parseFloat(c.current_ctc) : null,
-      c.expected_ctc !== undefined ? parseFloat(c.expected_ctc) : null,
-      c.notice_period_days !== undefined ? parseInt(c.notice_period_days, 10) : null,
+      c.current_ctc !== undefined ? safeFloat(c.current_ctc) : null,
+      c.expected_ctc !== undefined ? safeFloat(c.expected_ctc) : null,
+      c.notice_period_days !== undefined ? safeInt(c.notice_period_days) : null,
       c.linkedin_url, c.company, c.preferred_location, c.remarks, c.comment,
       id
     ]
