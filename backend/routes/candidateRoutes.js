@@ -13,7 +13,10 @@ const excelUpload = multer({
 
 router.use(authenticateToken);
 
-router.get('/', authorize(PERMISSIONS.CANDIDATE_VIEW), candidateController.getCandidates);
+router.get('/', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  next();
+}, authorize(PERMISSIONS.CANDIDATE_VIEW), candidateController.getCandidates);
 router.get('/recycle-bin', authorize(PERMISSIONS.CANDIDATE_DELETE), candidateController.getRecycleBin);
 router.get('/:id', authorize(PERMISSIONS.CANDIDATE_VIEW), candidateController.getCandidate);
 

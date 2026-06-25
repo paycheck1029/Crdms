@@ -27,7 +27,8 @@ import {
   AlertCircle,
   CheckCircle2,
   RefreshCw,
-  FolderLock
+  FolderLock,
+  Linkedin
 } from 'lucide-react';
 
 const PAGE_SIZE = 10;
@@ -448,6 +449,7 @@ export default function CandidatesDirectoryPage() {
                     <th>Location</th>
                     <th>Experience</th>
                     <th>Company</th>
+                    <th>CTC (Cur / Exp)</th>
                     <th>Status</th>
                     <th>Notice Period</th>
                     <th>Skills Inventory</th>
@@ -477,12 +479,44 @@ export default function CandidatesDirectoryPage() {
                             <div>
                               <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{c.name}</div>
                               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{c.email}</div>
+                              {(c.phone || c.linkedin_url) && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem' }}>
+                                  {c.phone && (
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '0.15rem' }}>
+                                      <Phone size={10} /> {c.phone}
+                                    </span>
+                                  )}
+                                  {c.linkedin_url && (
+                                    <a 
+                                      href={c.linkedin_url.startsWith('http') ? c.linkedin_url : `https://${c.linkedin_url}`} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      style={{ fontSize: '0.7rem', color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '0.15rem', textDecoration: 'none' }}
+                                    >
+                                      <Linkedin size={10} /> Profile
+                                    </a>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </td>
-                        <td>{c.location}</td>
+                        <td>
+                          <div>{c.location}</div>
+                          {c.preferred_location && (
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                              Pref: {c.preferred_location}
+                            </div>
+                          )}
+                        </td>
                         <td style={{ fontWeight: '600' }}>{c.experience_years} Years</td>
                         <td>{c.company || 'N/A'}</td>
+                        <td>
+                          <div>{formatCurrency(c.current_ctc)}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                            Exp: {formatCurrency(c.expected_ctc)}
+                          </div>
+                        </td>
                         <td>
                           <span style={{
                             display: 'inline-block',
@@ -677,9 +711,24 @@ export default function CandidatesDirectoryPage() {
                     <Phone size={14} style={{ color: 'var(--accent)' }} /> {selectedCandidate.phone || 'N/A'}
                   </span>
                 </div>
-                <div>
+                <div style={{ marginBottom: '1rem' }}>
                   <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Preferred Location</label>
                   <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>{selectedCandidate.preferred_location || 'N/A'}</span>
+                </div>
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>LinkedIn Profile</label>
+                  {selectedCandidate.linkedin_url ? (
+                    <a 
+                      href={selectedCandidate.linkedin_url.startsWith('http') ? selectedCandidate.linkedin_url : `https://${selectedCandidate.linkedin_url}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ fontSize: '0.9rem', color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', textDecoration: 'none' }}
+                    >
+                      <Linkedin size={14} /> View LinkedIn Profile
+                    </a>
+                  ) : (
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>N/A</span>
+                  )}
                 </div>
               </div>
 
