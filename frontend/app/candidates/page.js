@@ -486,7 +486,11 @@ export default function CandidatesDirectoryPage() {
                     const badgeStyle = STATUS_STYLE_MAP[c.status] || { bg: '#e5e7eb', color: '#1f2937' };
 
                     return (
-                      <tr key={c.id}>
+                      <tr 
+                        key={c.id}
+                        onClick={() => handleViewCandidate(c.id)}
+                        style={{ cursor: 'pointer' }}
+                      >
                         <td style={{ color: 'var(--text-muted)' }}>#{rowNum}</td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -505,7 +509,13 @@ export default function CandidatesDirectoryPage() {
                         </td>
                         <td>
                           {c.email ? (
-                            <a href={`mailto:${c.email}`} style={{ color: 'var(--accent)', textDecoration: 'none' }}>{c.email}</a>
+                            <a 
+                              href={`mailto:${c.email}`} 
+                              onClick={(e) => e.stopPropagation()}
+                              style={{ color: 'var(--accent)', textDecoration: 'none' }}
+                            >
+                              {c.email}
+                            </a>
                           ) : 'N/A'}
                         </td>
                         <td>{c.phone || 'N/A'}</td>
@@ -515,6 +525,7 @@ export default function CandidatesDirectoryPage() {
                               href={c.linkedin_url.startsWith('http') ? c.linkedin_url : `https://${c.linkedin_url}`} 
                               target="_blank" 
                               rel="noopener noreferrer" 
+                              onClick={(e) => e.stopPropagation()}
                               style={{ color: 'var(--accent)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
                             >
                               <LinkedInIcon size={12} /> Profile
@@ -566,7 +577,7 @@ export default function CandidatesDirectoryPage() {
                             {c.comment || 'N/A'}
                           </span>
                         </td>
-                        <td style={{ textAlign: 'right' }}>
+                        <td style={{ textAlign: 'right' }} onClick={(e) => e.stopPropagation()}>
                           <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'flex-end' }}>
                             {/* Preview */}
                             <button 
