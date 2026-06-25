@@ -461,15 +461,22 @@ export default function CandidatesDirectoryPage() {
                   <tr>
                     <th>Sr. No.</th>
                     <th className="sortable-header" onClick={() => handleSort('name')}>
-                      Candidate {sortField === 'name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+                      Name {sortField === 'name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
                     </th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>LinkedIn</th>
                     <th>Location</th>
+                    <th>Pref. Location</th>
                     <th>Experience</th>
                     <th>Company</th>
-                    <th>CTC (Cur / Exp)</th>
+                    <th>Current CTC</th>
+                    <th>Expected CTC</th>
                     <th>Status</th>
                     <th>Notice Period</th>
                     <th>Skills Inventory</th>
+                    <th>Remarks</th>
+                    <th>Comment</th>
                     <th style={{ textAlign: 'right', width: '130px' }}>Actions</th>
                   </tr>
                 </thead>
@@ -487,53 +494,39 @@ export default function CandidatesDirectoryPage() {
                               background: getAvatarColor(c.name).bg,
                               border: getAvatarColor(c.name).border,
                               color: getAvatarColor(c.name).fg,
-                              width: '32px', height: '32px', borderRadius: '50%',
+                              width: '28px', height: '28px', borderRadius: '50%',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontWeight: '700', fontSize: '0.8rem'
+                              fontWeight: '700', fontSize: '0.75rem'
                             }}>
                               {getInitials(c.name)}
                             </div>
-                            <div>
-                              <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{c.name}</div>
-                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{c.email}</div>
-                              {(c.phone || c.linkedin_url) && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem' }}>
-                                  {c.phone && (
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '0.15rem' }}>
-                                      <Phone size={10} /> {c.phone}
-                                    </span>
-                                  )}
-                                  {c.linkedin_url && (
-                                    <a 
-                                      href={c.linkedin_url.startsWith('http') ? c.linkedin_url : `https://${c.linkedin_url}`} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer" 
-                                      style={{ fontSize: '0.75rem', color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '0.15rem', textDecoration: 'none' }}
-                                    >
-                                      <LinkedInIcon size={10} /> Profile
-                                    </a>
-                                  )}
-                                </div>
-                              )}
-                            </div>
+                            <div style={{ fontWeight: '700', color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>{c.name}</div>
                           </div>
                         </td>
                         <td>
-                          <div>{c.location}</div>
-                          {c.preferred_location && (
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                              Pref: {c.preferred_location}
-                            </div>
-                          )}
+                          {c.email ? (
+                            <a href={`mailto:${c.email}`} style={{ color: 'var(--accent)', textDecoration: 'none' }}>{c.email}</a>
+                          ) : 'N/A'}
                         </td>
-                        <td style={{ fontWeight: '600' }}>{c.experience_years} Years</td>
+                        <td>{c.phone || 'N/A'}</td>
+                        <td>
+                          {c.linkedin_url ? (
+                            <a 
+                              href={c.linkedin_url.startsWith('http') ? c.linkedin_url : `https://${c.linkedin_url}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              style={{ color: 'var(--accent)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                            >
+                              <LinkedInIcon size={12} /> Profile
+                            </a>
+                          ) : 'N/A'}
+                        </td>
+                        <td>{c.location}</td>
+                        <td>{c.preferred_location || 'N/A'}</td>
+                        <td style={{ fontWeight: '600', whiteSpace: 'nowrap' }}>{c.experience_years} Years</td>
                         <td>{c.company || 'N/A'}</td>
-                        <td>
-                          <div>{formatCurrency(c.current_ctc)}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                            Exp: {formatCurrency(c.expected_ctc)}
-                          </div>
-                        </td>
+                        <td>{formatCurrency(c.current_ctc)}</td>
+                        <td>{formatCurrency(c.expected_ctc)}</td>
                         <td>
                           <span style={{
                             display: 'inline-block',
@@ -548,7 +541,7 @@ export default function CandidatesDirectoryPage() {
                             {c.status}
                           </span>
                         </td>
-                        <td>{formatNoticePeriod(c.notice_period_days)}</td>
+                        <td style={{ whiteSpace: 'nowrap' }}>{formatNoticePeriod(c.notice_period_days)}</td>
                         <td>
                           <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap', maxWidth: '200px' }}>
                             {c.skills.split(',').slice(0, 3).map(s => (
@@ -562,6 +555,16 @@ export default function CandidatesDirectoryPage() {
                               </span>
                             )}
                           </div>
+                        </td>
+                        <td>
+                          <span title={c.remarks} style={{ display: 'inline-block', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                            {c.remarks || 'N/A'}
+                          </span>
+                        </td>
+                        <td>
+                          <span title={c.comment} style={{ display: 'inline-block', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                            {c.comment || 'N/A'}
+                          </span>
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'flex-end' }}>
