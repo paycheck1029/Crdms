@@ -545,7 +545,7 @@ export default function CandidatesDirectoryPage() {
                         <td>
                           <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap', maxWidth: '200px' }}>
                             {c.skills.split(',').slice(0, 3).map(s => (
-                              <span key={s} className="skill-badge" style={{ fontSize: '0.65rem', padding: '0.15rem 0.35rem' }}>
+                              <span key={s} className="skill-badge">
                                 {s.trim().toUpperCase()}
                               </span>
                             ))}
