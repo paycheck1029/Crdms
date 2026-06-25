@@ -4,13 +4,14 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import candidateService from '@/services/candidateService';
-import { ArrowLeft, Save, Upload, File, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Save, Upload, File, AlertCircle, CheckCircle2, Trash2, Download } from 'lucide-react';
+import { API_URL } from '@/config';
 
 function CandidateFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
-  const { logout } = useAuth();
+  const { token, logout } = useAuth();
 
   // Form Field States
   const [activeFormTab, setActiveFormTab] = useState('personal'); // 'personal' | 'compensation' | 'resume'
@@ -34,6 +35,7 @@ function CandidateFormContent() {
   const [resumeFile, setResumeFile] = useState(null);
   const [isDragActive, setIsDragActive] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [existingDocuments, setExistingDocuments] = useState([]);
 
   // Status States
   const [loading, setLoading] = useState(false);
@@ -65,6 +67,7 @@ function CandidateFormContent() {
         setPreferredLocation(data.preferred_location || '');
         setRemarks(data.remarks || '');
         setComment(data.comment || '');
+        setExistingDocuments(data.documents || []);
       } catch (err) {
         if (err.message === 'Session expired') {
           logout();
@@ -78,6 +81,32 @@ function CandidateFormContent() {
 
     loadCandidate();
   }, [editId]);
+
+  const refreshDocuments = async () => {
+    if (!editId) return;
+    try {
+      const res = await candidateService.getCandidate(editId);
+      setExistingDocuments(res.data.documents || []);
+    } catch (err) {
+      console.error('Failed to refresh documents:', err);
+    }
+  };
+
+  const handleDeleteDocument = async (docId, fileName) => {
+    if (!confirm(`Are you sure you want to permanently delete the document "${fileName}"?`)) return;
+    try {
+      setLoading(true);
+      setError('');
+      setSuccess('');
+      await candidateService.deleteResume(docId);
+      setSuccess(`Document "${fileName}" deleted successfully.`);
+      await refreshDocuments();
+    } catch (err) {
+      setError(err.message || 'Failed to delete document.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -511,6 +540,54 @@ function CandidateFormContent() {
                     </div>
                   </div>
                 </div>
+
+                {editId && existingDocuments.length > 0 && (
+                  <div style={{ marginTop: '1rem' }}>
+                    <label className="form-label" style={{ marginBottom: '0.5rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>Current Resumes & Documents</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {existingDocuments.map((doc) => (
+                        <div key={doc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface-dim)', border: '1px solid var(--border)', padding: '0.5rem 0.75rem', borderRadius: '6px' }}>
+                          <span style={{ fontSize: '0.8rem', color: 'var(--text-primary)', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={doc.file_name}>
+                            {doc.file_name}
+                          </span>
+                          <div style={{ display: 'flex', gap: '0.35rem' }}>
+                            <a 
+                              href={`${API_URL}/uploads/download/${doc.id}?token=${token}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="btn btn-secondary"
+                              style={{ padding: '0.3rem 0.5rem', fontSize: '0.7rem', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                              title="Download document"
+                            >
+                              <Download size={12} />
+                              <span>Get file</span>
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteDocument(doc.id, doc.file_name)}
+                              className="btn"
+                              style={{ 
+                                padding: '0.3rem 0.5rem', 
+                                fontSize: '0.7rem', 
+                                borderRadius: '4px', 
+                                display: 'inline-flex', 
+                                alignItems: 'center', 
+                                gap: '0.25rem',
+                                background: 'var(--danger-dim)',
+                                borderColor: 'var(--danger-border)',
+                                color: 'var(--danger)',
+                                cursor: 'pointer'
+                              }}
+                              title="Delete document"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

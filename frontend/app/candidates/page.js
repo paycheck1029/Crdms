@@ -220,20 +220,6 @@ export default function CandidatesDirectoryPage() {
     }
   };
 
-  // Delete Candidate Document
-  const handleDeleteDocument = async (docId, fileName) => {
-    if (!confirm(`Are you sure you want to permanently delete the document "${fileName}"?`)) return;
-    try {
-      await candidateService.deleteResume(docId);
-      setActionSuccess(`Document "${fileName}" deleted successfully.`);
-      // Refresh the selected candidate details in the modal
-      if (selectedCandidate) {
-        handleViewCandidate(selectedCandidate.id);
-      }
-    } catch (err) {
-      alert(`Failed to delete document: ${err.message}`);
-    }
-  };
 
   // Excel Import Handler
   const handleImportExcel = async (e) => {
@@ -837,29 +823,17 @@ export default function CandidatesDirectoryPage() {
                     {selectedCandidate.documents.map((doc) => (
                       <div key={doc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface-dim)', border: '1px solid var(--border)', padding: '0.5rem 0.75rem', borderRadius: '6px' }}>
                         <span style={{ fontSize: '0.8rem', color: 'var(--text-primary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{doc.file_name}</span>
-                        {/* Action buttons */}
-                        <div style={{ display: 'flex', gap: '0.25rem' }}>
-                          <a 
-                            href={`${API_URL}/uploads/download/${doc.id}?token=${token}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="btn btn-secondary"
-                            style={{ padding: '0.3rem 0.5rem', fontSize: '0.7rem', borderRadius: '4px' }}
-                          >
-                            <Download size={12} />
-                            <span>Get file</span>
-                          </a>
-                          {hasRole(['Admin', 'HR Manager', 'Recruiter', 'Data Entry']) && (
-                            <button
-                              onClick={() => handleDeleteDocument(doc.id, doc.file_name)}
-                              className="btn btn-secondary"
-                              style={{ padding: '0.3rem 0.5rem', color: 'var(--danger)', borderRadius: '4px' }}
-                              title="Delete Document"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          )}
-                        </div>
+                        {/* Direct Secure Download Link */}
+                        <a 
+                          href={`${API_URL}/uploads/download/${doc.id}?token=${token}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-secondary"
+                          style={{ padding: '0.3rem 0.5rem', fontSize: '0.7rem', borderRadius: '4px' }}
+                        >
+                          <Download size={12} />
+                          <span>Get file</span>
+                        </a>
                       </div>
                     ))}
                   </div>
