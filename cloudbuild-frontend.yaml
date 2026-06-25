@@ -1,0 +1,15 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--target'
+      - 'frontend'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_API_URL=https://crdms-backend-922971997014.us-central1.run.app'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/secure-proxy-486913-m4/crdms-repo/frontend:latest'
+      - '-f'
+      - 'deployment/Dockerfile'
+      - '.'
+images:
+  - 'us-central1-docker.pkg.dev/secure-proxy-486913-m4/crdms-repo/frontend:latest'

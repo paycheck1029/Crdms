@@ -27,9 +27,26 @@ import {
   AlertCircle,
   CheckCircle2,
   RefreshCw,
-  FolderLock,
-  Linkedin
+  FolderLock
 } from 'lucide-react';
+
+const LinkedInIcon = ({ size = 14 }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+  >
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect width="4" height="12" x="2" y="9" />
+    <circle cx="4" cy="4" r="2" />
+  </svg>
+);
 
 const PAGE_SIZE = 10;
 
@@ -491,9 +508,9 @@ export default function CandidatesDirectoryPage() {
                                       href={c.linkedin_url.startsWith('http') ? c.linkedin_url : `https://${c.linkedin_url}`} 
                                       target="_blank" 
                                       rel="noopener noreferrer" 
-                                      style={{ fontSize: '0.7rem', color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '0.15rem', textDecoration: 'none' }}
+                                      style={{ fontSize: '0.75rem', color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '0.15rem', textDecoration: 'none' }}
                                     >
-                                      <Linkedin size={10} /> Profile
+                                      <LinkedInIcon size={10} /> Profile
                                     </a>
                                   )}
                                 </div>
@@ -724,7 +741,7 @@ export default function CandidatesDirectoryPage() {
                       rel="noreferrer"
                       style={{ fontSize: '0.9rem', color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', textDecoration: 'none' }}
                     >
-                      <Linkedin size={14} /> View LinkedIn Profile
+                      <LinkedInIcon size={14} /> View LinkedIn Profile
                     </a>
                   ) : (
                     <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>N/A</span>
