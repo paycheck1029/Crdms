@@ -46,8 +46,8 @@ export const buildCandidateQuery = (params, onlyDeleted = false) => {
   }
 
   if (params.location) {
-    sql += ' AND location LIKE ?';
-    queryParams.push(`%${params.location}%`);
+    sql += ' AND (location LIKE ? OR preferred_location LIKE ?)';
+    queryParams.push(`%${params.location}%`, `%${params.location}%`);
   }
 
   if (params.company) {

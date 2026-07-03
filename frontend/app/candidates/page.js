@@ -167,6 +167,12 @@ export default function CandidatesDirectoryPage() {
     setTimeout(() => fetchCandidates(), 50);
   };
 
+  const handleRemoveLocationFilter = () => {
+    setLocation('');
+    setCurrentPage(1);
+    setTimeout(() => fetchCandidates(), 50);
+  };
+
   // Sorting Handler
   const handleSort = (field) => {
     const isAsc = sortField === field && sortOrder === 'asc';
@@ -442,6 +448,45 @@ export default function CandidatesDirectoryPage() {
               <div className="form-group">
                 <label className="form-label" style={{ fontSize: '0.7rem' }}>Added Date To</label>
                 <input type="date" className="form-input" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+              </div>
+            </div>
+          )}
+
+          {/* Active location chip */}
+          {location && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Active Filters:</span>
+              <div style={{
+                background: 'var(--accent-dim)',
+                border: '1px solid var(--accent-border-soft)',
+                color: 'var(--accent)',
+                padding: '0.2rem 0.5rem 0.2rem 0.75rem',
+                borderRadius: '9999px',
+                fontSize: '0.75rem',
+                fontWeight: '600',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+              }}>
+                <span>Location: {location}</span>
+                <button
+                  type="button"
+                  onClick={handleRemoveLocationFilter}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--accent)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 0,
+                    opacity: 0.8
+                  }}
+                  title="Remove Location filter"
+                >
+                  <X size={12} />
+                </button>
               </div>
             </div>
           )}
