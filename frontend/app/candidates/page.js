@@ -774,7 +774,7 @@ export default function CandidatesDirectoryPage() {
             </div>
 
             {/* Profile Details Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '1.5rem 0', marginBottom: '1.5rem' }}>
+            <div className="grid-equal-2" style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '1.5rem 0', marginBottom: '1.5rem' }}>
               <div>
                 <div style={{ marginBottom: '1rem' }}>
                   <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Email Address</label>
@@ -831,7 +831,7 @@ export default function CandidatesDirectoryPage() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div className="grid-equal-2" style={{ marginBottom: '1.5rem' }}>
               <div>
                 <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Remarks</label>
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', background: 'var(--bg-surface-dim)', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border)', minHeight: '40px', whiteSpace: 'pre-wrap' }}>
@@ -858,7 +858,7 @@ export default function CandidatesDirectoryPage() {
             </div>
 
             {/* Split Documents & Timeline tabs */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '2rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
+            <div className="grid-equal-2" style={{ gap: '2rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
               
               {/* Documents tab */}
               <div>
@@ -951,8 +951,8 @@ export default function CandidatesDirectoryPage() {
               The Excel talent pool sheet has been processed successfully.
             </p>
 
-            <div style={{ 
-              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', 
+            <div className="grid-equal-2" style={{ 
+              gap: '1rem', 
               background: 'var(--bg-surface-dim)', border: '1px solid var(--border)',
               borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem', textAlign: 'left'
             }}>

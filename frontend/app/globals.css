@@ -615,26 +615,182 @@ body {
   color: var(--text-primary);
 }
 
+/* Responsive Grid System (Desktop / Default) */
+.grid-equal-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+.grid-equal-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+.grid-sidebar {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1.5rem;
+}
+.grid-form {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.25rem;
+}
+
+/* Global Image & SVG Responsiveness */
+img, svg {
+  max-width: 100%;
+  height: auto;
+}
+/* Input controls safeguard */
+.form-input, select, textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+/* Button grouping wrap */
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 /* ============================================
-   RESPONSIVE
+   RESPONSIVE LAYOUTS & BREAKPOINTS
    ============================================ */
-@media (max-width: 768px) {
-  body { flex-direction: column; }
-  .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: 0;
+
+/* Breakpoint 1: Tablets and Smaller (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .grid-equal-3 {
+    grid-template-columns: 1fr 1fr; /* 3 columns become 2 on tablets */
   }
+  .grid-sidebar {
+    grid-template-columns: 1fr; /* Sidebar collapses to single column */
+  }
+}
+
+/* Breakpoint 2: Phones/Small Tablets (max-width: 768px) */
+@media (max-width: 768px) {
+  body { 
+    flex-direction: column; 
+    padding-top: 80px; /* Offset for fixed top floating header */
+  }
+
+  /* Fixed pill sidebar/navbar at the top */
+  .sidebar {
+    width: calc(100% - 1.5rem);
+    max-width: 100%;
+    height: 56px;
+    position: fixed;
+    top: 0.75rem;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    border-radius: 20px;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow);
+  }
+
+  /* Main content offset reset */
+  .main-content { 
+    margin-left: 0; 
+    padding: 1.5rem 1rem 2rem 1rem; 
+  }
+
+  /* Horizontal swipe navigation menu */
   .sidebar-menu {
     flex-direction: row;
     overflow-x: auto;
-    padding: 0.5rem;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    padding: 0 0.25rem;
   }
-  .sidebar-user { display: none; }
-  .main-content { margin-left: 0; padding: 1rem; }
+  .sidebar-menu::-webkit-scrollbar {
+    display: none; /* Chrome & Safari */
+  }
+  
+  .sidebar-link {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  /* Compact User Profile logout bar */
+  .sidebar-logo-text {
+    display: none; /* Only show image logo to save space */
+  }
+  .sidebar-user-text {
+    display: none; /* Only show avatar and logout */
+  }
+  .sidebar-user {
+    gap: 0.5rem !important;
+  }
+
+  /* Grid Layouts to Single Column on Mobile */
+  .grid-equal-2,
+  .grid-equal-3,
+  .grid-sidebar,
+  .grid-form {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  /* Tables Scrollable Wrapper */
+  .table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  .data-table {
+    min-width: 1000px; /* Prevent column text squash */
+  }
+
+  /* Responsiveness for Modals on Mobile */
+  .modal-overlay {
+    padding: 0.75rem;
+  }
+  .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 1.25rem !important;
+  }
+}
+
+/* Breakpoint 3: Extra Small Phones (max-width: 480px) */
+@media (max-width: 480px) {
+  body {
+    padding-top: 72px;
+  }
+  .sidebar {
+    height: 48px;
+    top: 0.5rem;
+  }
+  .sidebar-logo img {
+    width: 18px;
+    height: 18px;
+  }
+  .sidebar-menu {
+    gap: 2px;
+  }
+  .sidebar-link {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  .sidebar-user button.logout-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0.35rem;
+  }
+  .sidebar-user div[style*="width: '32px'"] {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 0.75rem !important;
+  }
 }
 
 /* ============================================
@@ -661,6 +817,8 @@ body {
   position: relative;
   z-index: var(--z-modal-content);
   animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {

@@ -56,7 +56,7 @@ export default function Sidebar() {
           height={22}
           style={{ objectFit: 'contain' }}
         />
-        <span>Paycheck Alpha</span>
+        <span className="sidebar-logo-text">Paycheck Alpha</span>
       </div>
 
       <nav style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -98,7 +98,7 @@ export default function Sidebar() {
         }}>
           {user.username ? user.username.slice(0, 2).toUpperCase() : 'US'}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div className="sidebar-user-text" style={{ display: 'flex', flexDirection: 'column' }}>
           <div className="sidebar-username" title={user.username} style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.2 }}>
             {user.username}
           </div>

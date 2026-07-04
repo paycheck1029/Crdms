@@ -317,7 +317,7 @@ function CandidateFormContent() {
           </div>
 
           {/* Tab 1: Personal Details */}
-          <div style={{ display: activeFormTab === 'personal' ? 'grid' : 'none', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+          <div className="grid-equal-3" style={{ display: activeFormTab === 'personal' ? 'grid' : 'none' }}>
             <div className="form-group" style={{ marginBottom: '0.4rem' }}>
               <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Full Name *</label>
               <input
@@ -410,7 +410,7 @@ function CandidateFormContent() {
           </div>
 
           {/* Tab 2: Status & CTC */}
-          <div style={{ display: activeFormTab === 'compensation' ? 'grid' : 'none', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+          <div className="grid-equal-3" style={{ display: activeFormTab === 'compensation' ? 'grid' : 'none' }}>
             <div className="form-group" style={{ marginBottom: '0.4rem' }}>
               <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Current Status *</label>
               <select
@@ -478,7 +478,7 @@ function CandidateFormContent() {
 
           {/* Tab 3: Resume & Notes */}
           <div style={{ display: activeFormTab === 'resume' ? 'block' : 'none' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '1.25rem', alignItems: 'start' }}>
+            <div className="grid-form" style={{ alignItems: 'start' }}>
               <div>
                 <div className="form-group" style={{ marginBottom: '0.5rem' }}>
                   <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Remarks</label>
@@ -593,8 +593,8 @@ function CandidateFormContent() {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.85rem', marginTop: '0.85rem' }}>
-            <div style={{ display: 'flex', gap: '0.35rem' }}>
+          <div className="btn-group" style={{ justifyContent: 'space-between', alignItems: 'center', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.85rem', marginTop: '0.85rem', width: '100%' }}>
+            <div className="btn-group" style={{ gap: '0.35rem' }}>
               {activeFormTab !== 'personal' && (
                 <button
                   type="button"
@@ -617,7 +617,7 @@ function CandidateFormContent() {
               )}
             </div>
 
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className="btn-group" style={{ gap: '0.5rem' }}>
               <button 
                 type="button" 
                 onClick={() => router.push('/candidates')} 

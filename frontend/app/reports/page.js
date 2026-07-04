@@ -197,7 +197,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Breakdown Charts */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+      <div className="grid-equal-2">
         
         {/* Status Counts Breakdown */}
         <div className="glass-card">

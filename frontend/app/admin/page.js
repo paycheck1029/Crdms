@@ -276,7 +276,7 @@ export default function AdminPanelPage() {
 
       {/* View Content */}
       {activeTab === 'users' && hasRole(['Admin']) && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.5rem' }}>
+        <div className="grid-sidebar">
           
           {/* Users List */}
           <div className="glass-card">
