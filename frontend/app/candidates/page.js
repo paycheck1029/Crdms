@@ -264,13 +264,12 @@ export default function CandidatesDirectoryPage() {
           </p>
         </div>
         
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           {/* Recycle Bin toggle */}
           {hasRole(['Admin', 'HR Manager']) && (
             <button
               onClick={() => { setViewDeleted(!viewDeleted); setCurrentPage(1); }}
               className={`btn ${viewDeleted ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
               <FolderLock size={16} />
               <span>{viewDeleted ? 'View Active Pool' : 'Recycle Bin'}</span>
@@ -291,14 +290,13 @@ export default function CandidatesDirectoryPage() {
                 className="btn btn-secondary" 
                 onClick={() => fileInputRef.current?.click()} 
                 disabled={importing}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               >
                 <Upload size={16} />
                 <span>{importing ? 'Importing...' : 'Import sheet'}</span>
               </button>
 
               {/* Add Candidate */}
-              <Link href="/candidates/new" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Link href="/candidates/new" className="btn btn-primary">
                 <Plus size={16} />
                 <span>Add Candidate</span>
               </Link>
@@ -333,10 +331,11 @@ export default function CandidatesDirectoryPage() {
       {/* Search and Filters container */}
       <div className="glass-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
         <form onSubmit={handleSearchSubmit}>
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {/* Primary search row: search box + status dropdown, always visible */}
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
             {/* Search term */}
-            <div style={{ position: 'relative', flexGrow: 1, minWidth: '220px' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <div style={{ position: 'relative', flexGrow: 1, minWidth: '180px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
               <input 
                 type="text" 
                 className="form-input" 
@@ -352,7 +351,7 @@ export default function CandidatesDirectoryPage() {
               className="form-input"
               value={status}
               onChange={(e) => { setStatus(e.target.value); setCurrentPage(1); }}
-              style={{ width: '150px', appearance: 'none' }}
+              style={{ minWidth: '130px', flex: '0 1 auto', appearance: 'none' }}
             >
               <option value="">Status: All</option>
               <option value="Applied">Applied</option>
@@ -365,15 +364,18 @@ export default function CandidatesDirectoryPage() {
               <option value="Joining">Joining</option>
               <option value="Pending">Pending</option>
             </select>
+          </div>
 
+          {/* Secondary filter row: location + experience + skills */}
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
             {/* Location filter */}
             <input 
               type="text" 
               className="form-input" 
-              placeholder="Loc: e.g. Mumbai" 
+              placeholder="Location: e.g. Mumbai" 
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              style={{ width: '130px' }}
+              style={{ flex: '1 1 100px', minWidth: '100px' }}
             />
 
             {/* Experience Bounds */}
@@ -384,7 +386,7 @@ export default function CandidatesDirectoryPage() {
               placeholder="Min Exp" 
               value={minExp}
               onChange={(e) => setMinExp(e.target.value)}
-              style={{ width: '90px' }}
+              style={{ flex: '0 1 90px', minWidth: '80px' }}
             />
             <input 
               type="number" 
@@ -393,7 +395,7 @@ export default function CandidatesDirectoryPage() {
               placeholder="Max Exp" 
               value={maxExp}
               onChange={(e) => setMaxExp(e.target.value)}
-              style={{ width: '90px' }}
+              style={{ flex: '0 1 90px', minWidth: '80px' }}
             />
 
             {/* Skills */}
@@ -403,20 +405,23 @@ export default function CandidatesDirectoryPage() {
               placeholder="Skills: e.g. React, Node" 
               value={skills}
               onChange={(e) => setSkills(e.target.value)}
-              style={{ width: '160px' }}
+              style={{ flex: '1 1 130px', minWidth: '120px' }}
             />
+          </div>
 
-            <button type="submit" className="btn btn-primary" style={{ padding: '0.45rem 1rem' }}>
+          {/* Action buttons row */}
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <button type="submit" className="btn btn-primary" style={{ flex: '1 1 auto', minWidth: '80px' }}>
               Search
             </button>
-            <button type="button" className="btn btn-secondary" onClick={handleClearFilters} style={{ padding: '0.45rem 1rem' }}>
+            <button type="button" className="btn btn-secondary" onClick={handleClearFilters} style={{ flex: '1 1 auto', minWidth: '80px' }}>
               Clear
             </button>
             <button 
               type="button" 
               className="btn btn-secondary" 
               onClick={() => setShowAdvanced(!showAdvanced)} 
-              style={{ padding: '0.45rem 1rem' }}
+              style={{ flex: '2 1 auto', minWidth: '120px' }}
             >
               {showAdvanced ? 'Hide Advanced' : 'Advanced Filters'}
             </button>
@@ -697,27 +702,29 @@ export default function CandidatesDirectoryPage() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem', borderTop: '1px solid var(--border)', paddingTop: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                  Showing {Math.min((currentPage - 1) * PAGE_SIZE + 1, totalCandidates)}–{Math.min(currentPage * PAGE_SIZE, totalCandidates)} of {totalCandidates} candidates
+                  Showing {Math.min((currentPage - 1) * PAGE_SIZE + 1, totalCandidates)}–{Math.min(currentPage * PAGE_SIZE, totalCandidates)} of {totalCandidates}
                 </span>
-                <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <button
                     className="pagination-btn"
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
+                    aria-label="Previous page"
                   >
                     <ChevronLeft size={16} />
                   </button>
 
-                  <span style={{ fontSize: '0.85rem', fontWeight: '700', padding: '0 0.5rem' }}>
-                    Page {currentPage} of {totalPages}
+                  <span style={{ fontSize: '0.85rem', fontWeight: '700', padding: '0 0.5rem', whiteSpace: 'nowrap' }}>
+                    {currentPage} / {totalPages}
                   </span>
 
                   <button
                     className="pagination-btn"
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
+                    aria-label="Next page"
                   >
                     <ChevronRight size={16} />
                   </button>
@@ -735,28 +742,37 @@ export default function CandidatesDirectoryPage() {
       >
         {selectedCandidate && (
           <div className="glass-card modal-content" style={{ width: '100%', maxWidth: '720px', padding: '2rem', position: 'relative', maxHeight: '90vh', overflowY: 'auto' }}>
+            {/* Close button - 44px tap target */}
             <button 
               onClick={() => setSelectedCandidate(null)}
-              style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
+              style={{ 
+                position: 'absolute', right: '1rem', top: '1rem', 
+                background: 'transparent', border: 'none', cursor: 'pointer', 
+                color: 'var(--text-secondary)',
+                width: '44px', height: '44px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: '50%'
+              }}
+              aria-label="Close"
             >
               <X size={20} />
             </button>
 
-            {/* Profile Header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+            {/* Profile Header — wraps on narrow screens */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.5rem', paddingRight: '2.5rem', flexWrap: 'wrap' }}>
               <div style={{ 
                 background: getAvatarColor(selectedCandidate.name).bg, 
                 border: getAvatarColor(selectedCandidate.name).border,
                 color: getAvatarColor(selectedCandidate.name).fg,
-                width: '60px', height: '60px', borderRadius: '50%',
+                width: '52px', height: '52px', borderRadius: '50%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: '700', fontSize: '1.5rem'
+                fontWeight: '700', fontSize: '1.25rem', flexShrink: 0
               }}>
                 {getInitials(selectedCandidate.name)}
               </div>
-              <div>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: '700', margin: 0 }}>{selectedCandidate.name}</h2>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem', alignItems: 'center' }}>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '700', margin: 0, wordBreak: 'break-word' }}>{selectedCandidate.name}</h2>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.35rem', alignItems: 'center', flexWrap: 'wrap' }}>
                   <span style={{
                     display: 'inline-flex', padding: '0.2rem 0.55rem', borderRadius: '4px',
                     fontSize: '0.7rem', fontWeight: '700', textTransform: 'uppercase',
@@ -897,10 +913,11 @@ export default function CandidatesDirectoryPage() {
 
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
-              <button onClick={() => setSelectedCandidate(null)} className="btn btn-secondary" style={{ borderRadius: '6px' }}>Close</button>
+            {/* Modal action bar */}
+            <div className="btn-group" style={{ marginTop: '2rem', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
+              <button onClick={() => setSelectedCandidate(null)} className="btn btn-secondary" style={{ flex: '1 1 auto' }}>Close</button>
               {!viewDeleted && hasRole(['Admin', 'HR Manager', 'Recruiter', 'Data Entry']) && (
-                <Link href={`/candidates/new?edit=${selectedCandidate.id}`} className="btn btn-primary" style={{ borderRadius: '6px' }}>
+                <Link href={`/candidates/new?edit=${selectedCandidate.id}`} className="btn btn-primary" style={{ flex: '2 1 auto', justifyContent: 'center' }}>
                   <Edit3 size={16} />
                   <span>Edit Profile</span>
                 </Link>

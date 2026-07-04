@@ -327,6 +327,7 @@ export default function AdminPanelPage() {
                               }}
                               disabled={actionLoading}
                               title="Edit Details"
+                              aria-label={`Edit ${u.username}`}
                               onClick={() => handleStartEdit(u)}
                             >
                               <Edit3 size={14} style={{ color: editingUser && editingUser.id === u.id ? 'var(--accent)' : 'inherit' }} />
@@ -336,6 +337,7 @@ export default function AdminPanelPage() {
                               style={{ padding: '0.4rem 0.6rem', color: 'var(--danger)' }}
                               disabled={u.id === user?.id || actionLoading}
                               title={u.id === user?.id ? 'Self deletion blocked' : 'Delete Account'}
+                              aria-label={`Delete ${u.username}`}
                               onClick={() => handleDeleteUser(u.id, u.username)}
                             >
                               <Trash2 size={14} />
@@ -453,13 +455,13 @@ export default function AdminPanelPage() {
           </h2>
 
           {/* Filters for Logs */}
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div style={{ position: 'relative', flexGrow: 1 }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', flexGrow: 1, minWidth: '180px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
               <input 
                 type="text" 
                 className="form-input" 
-                placeholder="Filter logs by username (e.g. 'admin')..."
+                placeholder="Filter by username..."
                 value={searchLogUser}
                 onChange={(e) => setSearchLogUser(e.target.value)}
                 style={{ paddingLeft: '2.5rem' }}
@@ -472,7 +474,7 @@ export default function AdminPanelPage() {
               placeholder="Filter by action (e.g. 'Login')..."
               value={searchLogAction}
               onChange={(e) => setSearchLogAction(e.target.value)}
-              style={{ width: '250px' }}
+              style={{ minWidth: '160px', flex: '1 1 auto' }}
             />
           </div>
 

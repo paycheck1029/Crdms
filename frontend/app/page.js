@@ -102,8 +102,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* KPI Tiles (Phase 8 - Expanded Dashboard Cards) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+      {/* KPI Tiles */}
+      <div className="kpi-grid">
         
         <div className="glass-card kpi-card">
           <div className="kpi-details">

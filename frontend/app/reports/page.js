@@ -121,7 +121,7 @@ export default function ReportsPage() {
 
   return (
     <div>
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 className="page-title">Recruitment Analytics & Reports</h1>
           <p className="page-subtitle">Aggregate data metrics and export capabilities for management review.</p>
@@ -132,7 +132,7 @@ export default function ReportsPage() {
           disabled={exporting}
         >
           <Download size={16} />
-          <span>{exporting ? 'Exporting...' : 'Export Candidate DB (CSV)'}</span>
+          <span>{exporting ? 'Exporting...' : 'Export CSV'}</span>
         </button>
       </div>
 

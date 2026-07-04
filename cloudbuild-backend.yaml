@@ -1,0 +1,13 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--target'
+      - 'backend'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/secure-proxy-486913-m4/crdms-repo/backend:latest'
+      - '-f'
+      - 'deployment/Dockerfile'
+      - '.'
+images:
+  - 'us-central1-docker.pkg.dev/secure-proxy-486913-m4/crdms-repo/backend:latest'

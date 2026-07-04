@@ -258,61 +258,67 @@ function CandidateFormContent() {
       <div className="glass-card" style={{ padding: '1.25rem 1.5rem' }}>
         <form onSubmit={handleSubmit}>
           
-          {/* Tab Pill Selectors */}
-          <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1.25rem', background: 'var(--bg-surface-dim)', padding: '4px', borderRadius: '9999px', border: '1px solid var(--border)', width: 'fit-content' }}>
+          {/* Tab Pill Selectors — full-width on mobile */}
+          <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1.25rem', background: 'var(--bg-surface-dim)', padding: '4px', borderRadius: '12px', border: '1px solid var(--border)', width: '100%' }}>
             <button
               type="button"
               onClick={() => setActiveFormTab('personal')}
               style={{
-                padding: '0.4rem 1.25rem',
-                border: 'none',
-                background: activeFormTab === 'personal' ? 'var(--accent-dim)' : 'transparent',
+                flex: 1,
+                padding: '0.5rem 0.5rem',
                 border: activeFormTab === 'personal' ? '1px solid var(--accent-border-soft)' : '1px solid transparent',
+                background: activeFormTab === 'personal' ? 'var(--accent-dim)' : 'transparent',
                 color: activeFormTab === 'personal' ? 'var(--accent)' : 'var(--text-secondary)',
-                borderRadius: '9999px',
-                fontSize: '0.8rem',
+                borderRadius: '8px',
+                fontSize: '0.78rem',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'var(--ease)'
+                transition: 'var(--ease)',
+                whiteSpace: 'nowrap',
+                minHeight: '36px'
               }}
             >
-              1. Personal Details
+              Personal
             </button>
             <button
               type="button"
               onClick={() => setActiveFormTab('compensation')}
               style={{
-                padding: '0.4rem 1.25rem',
-                border: 'none',
-                background: activeFormTab === 'compensation' ? 'var(--accent-dim)' : 'transparent',
+                flex: 1,
+                padding: '0.5rem 0.5rem',
                 border: activeFormTab === 'compensation' ? '1px solid var(--accent-border-soft)' : '1px solid transparent',
+                background: activeFormTab === 'compensation' ? 'var(--accent-dim)' : 'transparent',
                 color: activeFormTab === 'compensation' ? 'var(--accent)' : 'var(--text-secondary)',
-                borderRadius: '9999px',
-                fontSize: '0.8rem',
+                borderRadius: '8px',
+                fontSize: '0.78rem',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'var(--ease)'
+                transition: 'var(--ease)',
+                whiteSpace: 'nowrap',
+                minHeight: '36px'
               }}
             >
-              2. Status & CTC
+              CTC & Status
             </button>
             <button
               type="button"
               onClick={() => setActiveFormTab('resume')}
               style={{
-                padding: '0.4rem 1.25rem',
-                border: 'none',
-                background: activeFormTab === 'resume' ? 'var(--accent-dim)' : 'transparent',
+                flex: 1,
+                padding: '0.5rem 0.5rem',
                 border: activeFormTab === 'resume' ? '1px solid var(--accent-border-soft)' : '1px solid transparent',
+                background: activeFormTab === 'resume' ? 'var(--accent-dim)' : 'transparent',
                 color: activeFormTab === 'resume' ? 'var(--accent)' : 'var(--text-secondary)',
-                borderRadius: '9999px',
-                fontSize: '0.8rem',
+                borderRadius: '8px',
+                fontSize: '0.78rem',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'var(--ease)'
+                transition: 'var(--ease)',
+                whiteSpace: 'nowrap',
+                minHeight: '36px'
               }}
             >
-              3. Resume & Notes
+              Resume
             </button>
           </div>
 
@@ -323,7 +329,6 @@ function CandidateFormContent() {
               <input
                 type="text"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="John Doe"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -592,17 +597,18 @@ function CandidateFormContent() {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="btn-group" style={{ justifyContent: 'space-between', alignItems: 'center', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.85rem', marginTop: '0.85rem', width: '100%' }}>
-            <div className="btn-group" style={{ gap: '0.35rem' }}>
+          {/* Action Buttons — responsive wrap layout */}
+          <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.85rem', marginTop: '0.85rem' }}>
+            {/* Navigation row: Back / Next */}
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
               {activeFormTab !== 'personal' && (
                 <button
                   type="button"
                   onClick={() => setActiveFormTab(activeFormTab === 'resume' ? 'compensation' : 'personal')}
                   className="btn btn-secondary"
-                  style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', borderRadius: '9999px', border: '1px solid var(--border)' }}
+                  style={{ flex: '1 1 auto', borderRadius: '9999px' }}
                 >
-                  Back
+                  ← Back
                 </button>
               )}
               {activeFormTab !== 'resume' && (
@@ -610,19 +616,20 @@ function CandidateFormContent() {
                   type="button"
                   onClick={() => setActiveFormTab(activeFormTab === 'personal' ? 'compensation' : 'resume')}
                   className="btn btn-primary"
-                  style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', borderRadius: '9999px' }}
+                  style={{ flex: '2 1 auto', borderRadius: '9999px' }}
                 >
-                  Next Step
+                  Next →
                 </button>
               )}
             </div>
 
-            <div className="btn-group" style={{ gap: '0.5rem' }}>
+            {/* Save / Cancel row */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button 
                 type="button" 
                 onClick={() => router.push('/candidates')} 
                 className="btn btn-secondary"
-                style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', borderRadius: '9999px', border: '1px solid var(--border)' }}
+                style={{ flex: '1 1 auto', borderRadius: '9999px' }}
                 disabled={loading}
               >
                 Cancel
@@ -630,7 +637,7 @@ function CandidateFormContent() {
               <button 
                 type="submit" 
                 className="btn btn-primary"
-                style={{ padding: '0.4rem 1.25rem', fontSize: '0.8rem', borderRadius: '9999px' }}
+                style={{ flex: '2 1 auto', borderRadius: '9999px' }}
                 disabled={loading}
               >
                 <Save size={14} />
