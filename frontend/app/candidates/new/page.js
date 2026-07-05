@@ -339,7 +339,6 @@ function CandidateFormContent() {
               <input
                 type="email"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="john.doe@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -350,7 +349,6 @@ function CandidateFormContent() {
               <input
                 type="text"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="+91 9876543210"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
@@ -361,7 +359,6 @@ function CandidateFormContent() {
               <input
                 type="text"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="Mumbai"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
@@ -372,7 +369,6 @@ function CandidateFormContent() {
               <input
                 type="text"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="Infosys"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
@@ -383,7 +379,6 @@ function CandidateFormContent() {
               <input
                 type="text"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="linkedin.com/in/username"
                 value={linkedinUrl}
                 onChange={(e) => setLinkedinUrl(e.target.value)}
@@ -394,7 +389,6 @@ function CandidateFormContent() {
               <input
                 type="text"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="React, Node.js, SQL"
                 value={skills}
                 onChange={(e) => setSkills(e.target.value)}
@@ -406,7 +400,6 @@ function CandidateFormContent() {
                 type="number"
                 step="0.1"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="3.5"
                 value={experienceYears}
                 onChange={(e) => setExperienceYears(e.target.value)}
@@ -420,7 +413,7 @@ function CandidateFormContent() {
               <label className="form-label" style={{ marginBottom: '0.2rem', fontSize: '0.7rem' }}>Current Status *</label>
               <select
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', appearance: 'none' }}
+                style={{ appearance: 'none' }}
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               >
@@ -440,7 +433,6 @@ function CandidateFormContent() {
               <input
                 type="text"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="Pune"
                 value={preferredLocation}
                 onChange={(e) => setPreferredLocation(e.target.value)}
@@ -451,7 +443,6 @@ function CandidateFormContent() {
               <input
                 type="number"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="30"
                 value={noticePeriod}
                 onChange={(e) => setNoticePeriod(e.target.value)}
@@ -462,7 +453,6 @@ function CandidateFormContent() {
               <input
                 type="number"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="1200000"
                 value={currentCtc}
                 onChange={(e) => setCurrentCtc(e.target.value)}
@@ -473,7 +463,6 @@ function CandidateFormContent() {
               <input
                 type="number"
                 className="form-input"
-                style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem' }}
                 placeholder="1500000"
                 value={expectedCtc}
                 onChange={(e) => setExpectedCtc(e.target.value)}
@@ -492,7 +481,7 @@ function CandidateFormContent() {
                     placeholder="Enter remarks..."
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
-                    style={{ minHeight: '75px', maxHeight: '110px', fontSize: '0.8rem', padding: '0.5rem', fontFamily: 'inherit', resize: 'vertical' }}
+                    style={{ minHeight: '75px', maxHeight: '110px', fontFamily: 'inherit', resize: 'vertical' }}
                   />
                 </div>
                 <div className="form-group" style={{ marginBottom: '0.5rem' }}>
@@ -502,7 +491,7 @@ function CandidateFormContent() {
                     placeholder="Enter comments..."
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    style={{ minHeight: '75px', maxHeight: '110px', fontSize: '0.8rem', padding: '0.5rem', fontFamily: 'inherit', resize: 'vertical' }}
+                    style={{ minHeight: '75px', maxHeight: '110px', fontFamily: 'inherit', resize: 'vertical' }}
                   />
                 </div>
               </div>
