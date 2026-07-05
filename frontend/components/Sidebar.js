@@ -72,6 +72,7 @@ export default function Sidebar() {
                 <Link
                   href={item.path}
                   className={`sidebar-link ${isActive ? 'active' : ''}`}
+                  title={item.name}
                 >
                   {item.icon}
                   <span>{item.name}</span>
