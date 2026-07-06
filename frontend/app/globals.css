@@ -86,7 +86,6 @@
 select, textarea {
   width: 100%;
   max-width: 100%;
-  min-height: 44px;
   box-sizing: border-box;
   font-family: inherit;
   font-size: 0.875rem;
@@ -235,10 +234,8 @@ body {
   color: var(--text-secondary);
   border-radius: 50%;
   transition: var(--ease);
-  min-width: 44px;
-  min-height: 44px;
-  width: 44px;
-  height: 44px;
+  width: 32px;
+  height: 32px;
   margin-top: 0;
 }
 
@@ -370,8 +367,7 @@ body {
   background: var(--bg-surface-dim);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0.72rem 0.875rem;
-  min-height: 44px; /* WCAG / Apple HIG minimum tap target */
+  padding: 0.625rem 0.875rem;
   color: var(--text-primary);
   font-family: inherit;
   font-size: 0.875rem;
@@ -397,8 +393,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  padding: 0.65rem 1.1rem;
-  min-height: 44px; /* WCAG / Apple HIG minimum tap target */
+  padding: 0.6rem 1.1rem;
   border-radius: var(--radius);
   font-weight: 600;
   font-size: 0.85rem;
@@ -598,7 +593,6 @@ body {
   font-size: 0.85rem;
   font-weight: 600;
   padding: 0.75rem 1.25rem;
-  min-height: 44px;
   cursor: pointer;
   transition: var(--ease);
   font-family: inherit;
@@ -867,6 +861,29 @@ img, svg {
 
   /* ── Dropzone: reduce padding ── */
   .dropzone { padding: 1.25rem; }
+
+  /* 44px minimum tap targets for interactive elements inside media query */
+  .btn {
+    min-height: 44px;
+    padding: 0.65rem 1.1rem;
+  }
+  .form-input, select, textarea {
+    min-height: 44px;
+    padding: 0.72rem 0.875rem;
+  }
+  .logout-btn {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+  }
+  .tab-btn {
+    min-height: 44px;
+  }
+  .pagination-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }
 
 /* ─── Breakpoint 3: Small Phones (≤ 480px) ─── */
