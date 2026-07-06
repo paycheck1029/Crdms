@@ -420,12 +420,66 @@ export default function CandidatesDirectoryPage() {
 
           {/* Secondary filter row: location + experience + skills */}
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-            {/* Location filter */}
-            <div style={{ flex: '1 1 200px', minWidth: '160px', display: 'flex', flexDirection: 'column' }}>
+            {/* Location filter (Inline Chips) */}
+            <div 
+              className="form-input" 
+              onClick={() => document.getElementById('loc-tag-input')?.focus()}
+              style={{ 
+                flex: '1 1 200px', 
+                minWidth: '160px', 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                alignItems: 'center', 
+                gap: '0.25rem', 
+                padding: '0.25rem 0.5rem',
+                minHeight: '38px',
+                height: 'auto',
+                cursor: 'text'
+              }}
+            >
+              {selectedLocations.map((loc, idx) => (
+                <div key={idx} style={{
+                  background: 'var(--accent-dim)',
+                  border: '1px solid var(--accent-border-soft)',
+                  color: 'var(--accent)',
+                  padding: '0.1rem 0.35rem 0.1rem 0.5rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.72rem',
+                  fontWeight: '600',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.25rem',
+                  whiteSpace: 'nowrap'
+                }}>
+                  <span>{loc}</span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveLocationChip(idx);
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--accent)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0.25rem',
+                      margin: '-0.25rem -0.25rem -0.25rem 0rem',
+                      opacity: 0.8
+                    }}
+                    title={`Remove ${loc}`}
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
+              ))}
               <input 
+                id="loc-tag-input"
                 type="text" 
-                className="form-input" 
-                placeholder="Location: type &amp; press Enter" 
+                placeholder={selectedLocations.length === 0 ? "Location: e.g. Mumbai" : ""} 
                 value={locationInput}
                 onChange={(e) => setLocationInput(e.target.value)}
                 onKeyDown={handleLocationKeyDown}
@@ -434,47 +488,19 @@ export default function CandidatesDirectoryPage() {
                     handleAddLocationChip(e.target.value);
                   }
                 }}
+                style={{
+                  border: 'none',
+                  outline: 'none',
+                  background: 'transparent',
+                  padding: '0.15rem 0',
+                  margin: 0,
+                  flex: '1 1 60px',
+                  minWidth: '60px',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.85rem',
+                  fontFamily: 'inherit'
+                }}
               />
-              {selectedLocations.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.4rem' }}>
-                  {selectedLocations.map((loc, idx) => (
-                    <div key={idx} style={{
-                      background: 'var(--accent-dim)',
-                      border: '1px solid var(--accent-border-soft)',
-                      color: 'var(--accent)',
-                      padding: '0.15rem 0.4rem 0.15rem 0.6rem',
-                      borderRadius: '9999px',
-                      fontSize: '0.72rem',
-                      fontWeight: '600',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      <span>{loc}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveLocationChip(idx)}
-                        style={{
-                          background: 'transparent',
-                          border: 'none',
-                          color: 'var(--accent)',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: '0.4rem',
-                          margin: '-0.4rem -0.4rem -0.4rem 0rem',
-                          opacity: 0.8
-                        }}
-                        title={`Remove ${loc}`}
-                      >
-                        <X size={10} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Experience Bounds */}
@@ -497,12 +523,66 @@ export default function CandidatesDirectoryPage() {
               style={{ flex: '0 1 90px', minWidth: '80px' }}
             />
 
-            {/* Skills */}
-            <div style={{ flex: '1 1 240px', minWidth: '180px', display: 'flex', flexDirection: 'column' }}>
+            {/* Skills filter (Inline Chips) */}
+            <div 
+              className="form-input" 
+              onClick={() => document.getElementById('skills-tag-input')?.focus()}
+              style={{ 
+                flex: '1 1 240px', 
+                minWidth: '180px', 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                alignItems: 'center', 
+                gap: '0.25rem', 
+                padding: '0.25rem 0.5rem',
+                minHeight: '38px',
+                height: 'auto',
+                cursor: 'text'
+              }}
+            >
+              {selectedSkills.map((sk, idx) => (
+                <div key={idx} style={{
+                  background: 'rgba(192, 132, 252, 0.1)',
+                  border: '1px solid rgba(192, 132, 252, 0.25)',
+                  color: '#c084fc',
+                  padding: '0.1rem 0.35rem 0.1rem 0.5rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.72rem',
+                  fontWeight: '600',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.25rem',
+                  whiteSpace: 'nowrap'
+                }}>
+                  <span>{sk}</span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveSkillChip(idx);
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#c084fc',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0.25rem',
+                      margin: '-0.25rem -0.25rem -0.25rem 0rem',
+                      opacity: 0.8
+                    }}
+                    title={`Remove ${sk}`}
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
+              ))}
               <input 
+                id="skills-tag-input"
                 type="text" 
-                className="form-input" 
-                placeholder="Skills: type &amp; press Enter" 
+                placeholder={selectedSkills.length === 0 ? "Skills: e.g. React, Node" : ""} 
                 value={skillsInput}
                 onChange={(e) => setSkillsInput(e.target.value)}
                 onKeyDown={handleSkillsKeyDown}
@@ -511,47 +591,19 @@ export default function CandidatesDirectoryPage() {
                     handleAddSkillChip(e.target.value);
                   }
                 }}
+                style={{
+                  border: 'none',
+                  outline: 'none',
+                  background: 'transparent',
+                  padding: '0.15rem 0',
+                  margin: 0,
+                  flex: '1 1 80px',
+                  minWidth: '80px',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.85rem',
+                  fontFamily: 'inherit'
+                }}
               />
-              {selectedSkills.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.4rem' }}>
-                  {selectedSkills.map((sk, idx) => (
-                    <div key={idx} style={{
-                      background: 'rgba(192, 132, 252, 0.1)',
-                      border: '1px solid rgba(192, 132, 252, 0.25)',
-                      color: '#c084fc',
-                      padding: '0.15rem 0.4rem 0.15rem 0.6rem',
-                      borderRadius: '9999px',
-                      fontSize: '0.72rem',
-                      fontWeight: '600',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      <span>{sk}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveSkillChip(idx)}
-                        style={{
-                          background: 'transparent',
-                          border: 'none',
-                          color: '#c084fc',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: '0.4rem',
-                          margin: '-0.4rem -0.4rem -0.4rem 0rem',
-                          opacity: 0.8
-                        }}
-                        title={`Remove ${sk}`}
-                      >
-                        <X size={10} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
