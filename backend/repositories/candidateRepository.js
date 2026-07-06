@@ -46,8 +46,17 @@ export const buildCandidateQuery = (params, onlyDeleted = false) => {
   }
 
   if (params.location) {
-    sql += ' AND (location LIKE ? OR preferred_location LIKE ?)';
-    queryParams.push(`%${params.location}%`, `%${params.location}%`);
+    const locList = params.location.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+    if (locList.length > 0) {
+      sql += ' AND (';
+      const locClauses = [];
+      locList.forEach(loc => {
+        locClauses.push('(LOWER(location) LIKE ? OR LOWER(preferred_location) LIKE ?)');
+        queryParams.push(`%${loc}%`, `%${loc}%`);
+      });
+      sql += locClauses.join(' OR ');
+      sql += ')';
+    }
   }
 
   if (params.company) {

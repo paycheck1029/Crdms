@@ -63,10 +63,12 @@ export default function CandidatesDirectoryPage() {
   // Filters
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
-  const [location, setLocation] = useState('');
+  const [selectedLocations, setSelectedLocations] = useState([]);
+  const [locationInput, setLocationInput] = useState('');
   const [minExp, setMinExp] = useState('');
   const [maxExp, setMaxExp] = useState('');
-  const [skills, setSkills] = useState('');
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [skillsInput, setSkillsInput] = useState('');
   
   // Advanced filters toggle & states
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -100,6 +102,16 @@ export default function CandidatesDirectoryPage() {
       setActionError('');
       setActionSuccess('');
 
+      // Build parameters, combining array chips and any unsubmitted input box value
+      const activeLocations = [...selectedLocations];
+      if (locationInput.trim()) {
+        activeLocations.push(locationInput.trim());
+      }
+      const activeSkills = [...selectedSkills];
+      if (skillsInput.trim()) {
+        activeSkills.push(skillsInput.trim());
+      }
+
       const params = {
         page: currentPage,
         limit: PAGE_SIZE,
@@ -107,10 +119,10 @@ export default function CandidatesDirectoryPage() {
         order: sortOrder,
         search,
         status,
-        location,
+        location: activeLocations.filter(Boolean).join(','),
         minExp,
         maxExp,
-        skills,
+        skills: activeSkills.filter(Boolean).join(','),
         name,
         email,
         phone,
@@ -152,10 +164,12 @@ export default function CandidatesDirectoryPage() {
   const handleClearFilters = () => {
     setSearch('');
     setStatus('');
-    setLocation('');
+    setLocationInput('');
+    setSelectedLocations([]);
     setMinExp('');
     setMaxExp('');
-    setSkills('');
+    setSkillsInput('');
+    setSelectedSkills([]);
     setName('');
     setEmail('');
     setPhone('');
@@ -167,10 +181,48 @@ export default function CandidatesDirectoryPage() {
     setTimeout(() => fetchCandidates(), 50);
   };
 
-  const handleRemoveLocationFilter = () => {
-    setLocation('');
-    setCurrentPage(1);
-    setTimeout(() => fetchCandidates(), 50);
+  const handleAddLocationChip = (value) => {
+    const cleaned = value.trim();
+    if (cleaned && !selectedLocations.includes(cleaned)) {
+      setSelectedLocations([...selectedLocations, cleaned]);
+    }
+    setLocationInput('');
+  };
+
+  const handleRemoveLocationChip = (indexToRemove) => {
+    setSelectedLocations(selectedLocations.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleAddSkillChip = (value) => {
+    const cleaned = value.trim();
+    if (cleaned && !selectedSkills.includes(cleaned)) {
+      setSelectedSkills([...selectedSkills, cleaned]);
+    }
+    setSkillsInput('');
+  };
+
+  const handleRemoveSkillChip = (indexToRemove) => {
+    setSelectedSkills(selectedSkills.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleLocationKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      const value = locationInput.trim();
+      if (value) {
+        e.preventDefault();
+        handleAddLocationChip(value);
+      }
+    }
+  };
+
+  const handleSkillsKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      const value = skillsInput.trim();
+      if (value) {
+        e.preventDefault();
+        handleAddSkillChip(value);
+      }
+    }
   };
 
   // Sorting Handler
@@ -369,14 +421,61 @@ export default function CandidatesDirectoryPage() {
           {/* Secondary filter row: location + experience + skills */}
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
             {/* Location filter */}
-            <input 
-              type="text" 
-              className="form-input" 
-              placeholder="Location: e.g. Mumbai" 
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              style={{ flex: '1 1 100px', minWidth: '100px' }}
-            />
+            <div style={{ flex: '1 1 200px', minWidth: '160px', display: 'flex', flexDirection: 'column' }}>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="Location: type &amp; press Enter" 
+                value={locationInput}
+                onChange={(e) => setLocationInput(e.target.value)}
+                onKeyDown={handleLocationKeyDown}
+                onBlur={(e) => {
+                  if (e.target.value.trim()) {
+                    handleAddLocationChip(e.target.value);
+                  }
+                }}
+              />
+              {selectedLocations.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.4rem' }}>
+                  {selectedLocations.map((loc, idx) => (
+                    <div key={idx} style={{
+                      background: 'var(--accent-dim)',
+                      border: '1px solid var(--accent-border-soft)',
+                      color: 'var(--accent)',
+                      padding: '0.15rem 0.4rem 0.15rem 0.6rem',
+                      borderRadius: '9999px',
+                      fontSize: '0.72rem',
+                      fontWeight: '600',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      <span>{loc}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveLocationChip(idx)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--accent)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '0.4rem',
+                          margin: '-0.4rem -0.4rem -0.4rem 0rem',
+                          opacity: 0.8
+                        }}
+                        title={`Remove ${loc}`}
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Experience Bounds */}
             <input 
@@ -399,14 +498,61 @@ export default function CandidatesDirectoryPage() {
             />
 
             {/* Skills */}
-            <input 
-              type="text" 
-              className="form-input" 
-              placeholder="Skills: e.g. React, Node" 
-              value={skills}
-              onChange={(e) => setSkills(e.target.value)}
-              style={{ flex: '1 1 130px', minWidth: '120px' }}
-            />
+            <div style={{ flex: '1 1 240px', minWidth: '180px', display: 'flex', flexDirection: 'column' }}>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="Skills: type &amp; press Enter" 
+                value={skillsInput}
+                onChange={(e) => setSkillsInput(e.target.value)}
+                onKeyDown={handleSkillsKeyDown}
+                onBlur={(e) => {
+                  if (e.target.value.trim()) {
+                    handleAddSkillChip(e.target.value);
+                  }
+                }}
+              />
+              {selectedSkills.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.4rem' }}>
+                  {selectedSkills.map((sk, idx) => (
+                    <div key={idx} style={{
+                      background: 'rgba(192, 132, 252, 0.1)',
+                      border: '1px solid rgba(192, 132, 252, 0.25)',
+                      color: '#c084fc',
+                      padding: '0.15rem 0.4rem 0.15rem 0.6rem',
+                      borderRadius: '9999px',
+                      fontSize: '0.72rem',
+                      fontWeight: '600',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      <span>{sk}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSkillChip(idx)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#c084fc',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '0.4rem',
+                          margin: '-0.4rem -0.4rem -0.4rem 0rem',
+                          opacity: 0.8
+                        }}
+                        title={`Remove ${sk}`}
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Action buttons row */}
@@ -457,44 +603,7 @@ export default function CandidatesDirectoryPage() {
             </div>
           )}
 
-          {/* Active location chip */}
-          {location && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Active Filters:</span>
-              <div style={{
-                background: 'var(--accent-dim)',
-                border: '1px solid var(--accent-border-soft)',
-                color: 'var(--accent)',
-                padding: '0.2rem 0.5rem 0.2rem 0.75rem',
-                borderRadius: '9999px',
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-              }}>
-                <span>Location: {location}</span>
-                <button
-                  type="button"
-                  onClick={handleRemoveLocationFilter}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--accent)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 0,
-                    opacity: 0.8
-                  }}
-                  title="Remove Location filter"
-                >
-                  <X size={12} />
-                </button>
-              </div>
-            </div>
-          )}
+
         </form>
       </div>
 

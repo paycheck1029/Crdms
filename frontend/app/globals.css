@@ -677,6 +677,12 @@ body {
   width: 100%;
   justify-content: center;
 }
+/* Reorder grid items on mobile/tablets */
+@media (max-width: 768px) {
+  .order-first-mobile {
+    order: -1 !important;
+  }
+}
 /* Flex wrap group for button bars */
 .btn-group {
   display: flex;

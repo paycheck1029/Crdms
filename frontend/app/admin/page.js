@@ -353,7 +353,7 @@ export default function AdminPanelPage() {
           </div>
 
           {/* User Form (Create / Edit Mode) */}
-          <div className="glass-card" style={{ height: 'fit-content' }}>
+          <div className="glass-card order-first-mobile" style={{ height: 'fit-content' }}>
             <h2 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <UserPlus size={18} className="kpi-purple" />
               <span>{editingUser ? `Modify Account: @${editingUser.username}` : 'Provision Account'}</span>
