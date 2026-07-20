@@ -13,5 +13,7 @@ router.get('/', userController.getUsers);
 router.post('/', validateUserCreate, userController.createUser);
 router.put('/:id', validateUserUpdate, userController.updateUser);
 router.delete('/:id', userController.deleteUser);
+router.put('/:id/approve', userController.approveUser);
+router.put('/:id/block', userController.blockUser);
 
 export default router;

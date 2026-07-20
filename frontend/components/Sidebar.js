@@ -10,7 +10,8 @@ import {
   Users,
   BarChart3,
   ShieldAlert,
-  LogOut
+  LogOut,
+  Briefcase
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -24,27 +25,44 @@ export default function Sidebar() {
       name: 'Dashboard',
       path: '/',
       icon: <LayoutDashboard size={20} />,
-      roles: ['Admin', 'Recruitment Team', 'Management', 'IT Team']
+      roles: ['Admin', 'HR Manager', 'Recruiter', 'Interviewer', 'Data Entry', 'Viewer']
     },
     {
       name: 'Candidates',
       path: '/candidates',
       icon: <Users size={20} />,
-      roles: ['Admin', 'Recruitment Team', 'Management', 'IT Team']
+      roles: ['Admin', 'HR Manager', 'Recruiter', 'Interviewer', 'Data Entry', 'Viewer']
+    },
+    {
+      name: 'Job Postings',
+      path: '/jobs',
+      icon: <Briefcase size={20} />,
+      roles: ['Admin', 'HR Manager', 'Recruiter']
     },
     {
       name: 'Reports',
       path: '/reports',
       icon: <BarChart3 size={20} />,
-      roles: ['Admin', 'Management']
+      roles: ['Admin', 'HR Manager', 'Recruiter']
     },
     {
       name: 'Admin Panel',
       path: '/admin',
       icon: <ShieldAlert size={20} />,
-      roles: ['Admin', 'IT Team']
+      roles: ['Admin']
     }
   ];
+
+  // Dynamic menu filtering for unapproved sandbox recruiters
+  const filteredMenuItems = menuItems.filter(item => {
+    const hasPermission = !item.roles || hasRole(item.roles);
+    if (!hasPermission) return false;
+
+    if (user.status === 'Pending') {
+      return item.name === 'Dashboard' || item.name === 'Job Postings';
+    }
+    return true;
+  });
 
   return (
     <aside className="sidebar">
@@ -61,10 +79,7 @@ export default function Sidebar() {
 
       <nav style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         <ul className="sidebar-menu">
-          {menuItems.map((item) => {
-            const hasPermission = !item.roles || hasRole(item.roles);
-            if (!hasPermission) return null;
-
+          {filteredMenuItems.map((item) => {
             const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
 
             return (

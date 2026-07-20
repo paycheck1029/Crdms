@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import uploadController from '../controllers/uploadController.js';
-import { authenticateToken, authorize } from '../middleware/authMiddleware.js';
+import { authenticateToken, authorize, checkApproved } from '../middleware/authMiddleware.js';
 import { PERMISSIONS } from '../config/roles.js';
 
 const router = express.Router();
@@ -11,6 +11,7 @@ const upload = multer({
 });
 
 router.use(authenticateToken);
+router.use(checkApproved);
 
 router.post('/', authorize(PERMISSIONS.CANDIDATE_EDIT), upload.single('resume'), uploadController.uploadCandidateDocument);
 router.get('/download/:id', authorize(PERMISSIONS.CANDIDATE_VIEW), uploadController.downloadDocument);

@@ -13,6 +13,9 @@ CREATE TABLE IF NOT EXISTS Users (
   email VARCHAR(255) NOT NULL UNIQUE,
   role VARCHAR(100) NOT NULL,
   email_verified BOOLEAN DEFAULT FALSE,
+  status VARCHAR(50) DEFAULT 'Pending',
+  linkedin_id VARCHAR(255) UNIQUE DEFAULT NULL,
+  profile_pic_url TEXT DEFAULT NULL,
   refresh_token VARCHAR(500) DEFAULT NULL,
   login_attempts INT DEFAULT 0,
   locked_until DATETIME DEFAULT NULL,
@@ -92,4 +95,20 @@ CREATE TABLE IF NOT EXISTS ActivityLogs (
   INDEX idx_logs_timestamp (timestamp),
   INDEX idx_logs_username (username),
   INDEX idx_logs_action (action)
+);
+
+CREATE TABLE IF NOT EXISTS Jobs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  requirements TEXT DEFAULT NULL,
+  location VARCHAR(255) NOT NULL,
+  salary_range VARCHAR(100) DEFAULT NULL,
+  status VARCHAR(50) DEFAULT 'Pending',
+  created_by INT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES Users(id) ON DELETE CASCADE,
+  INDEX idx_jobs_status (status),
+  INDEX idx_jobs_creator (created_by)
 );

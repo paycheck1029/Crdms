@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import reportService from '@/services/reportService';
 import auditService from '@/services/auditService';
@@ -17,13 +18,17 @@ import {
 } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { hasRole, logout } = useAuth();
+  const { user, hasRole, logout } = useAuth();
   const [reportData, setReportData] = useState(null);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const fetchData = async () => {
+    if (user?.status === 'Pending') {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       
@@ -48,8 +53,10 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -77,6 +84,98 @@ export default function DashboardPage() {
   
   // Trends
   const monthlyTrends = reportData?.trends?.monthly || [];
+
+  if (user?.status === 'Pending') {
+    return (
+      <div>
+        <div style={{
+          background: 'rgba(245, 158, 11, 0.1)',
+          border: '1px solid rgba(245, 158, 11, 0.3)',
+          borderRadius: '8px',
+          padding: '1.25rem',
+          color: '#d97706',
+          marginBottom: '2rem',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '0.75rem',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+        }}>
+          <AlertCircle size={24} style={{ flexShrink: 0, marginTop: '0.1rem' }} />
+          <div>
+            <h4 style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '0.25rem' }}>Registration Pending Approval</h4>
+            <p style={{ fontSize: '0.85rem', lineHeight: '1.4', margin: 0, opacity: 0.9 }}>
+              Thank you for signing up with Paycheck Alpha via LinkedIn! Your recruiter profile is currently under review by our Super Admin. 
+              While your account is pending approval, you can post and manage jobs using the <strong>Job Postings</strong> section. 
+              Once approved, you will receive an email notification and full access to candidate records will be unlocked.
+            </p>
+          </div>
+        </div>
+
+        <div className="page-header">
+          <h1 className="page-title">Recruiter Dashboard</h1>
+          <p className="page-subtitle">Post new job openings to the public portal or track review statuses.</p>
+        </div>
+
+        <div style={{ position: 'relative', minHeight: '350px' }}>
+          <div style={{ filter: 'blur(4px) opacity(0.35)', pointerEvents: 'none' }}>
+            <div className="kpi-grid">
+              <div className="glass-card kpi-card">
+                <div className="kpi-details">
+                  <h3>Total Candidates</h3>
+                  <div className="kpi-val">--</div>
+                </div>
+                <div className="kpi-icon-wrapper kpi-cyan">
+                  <Users size={24} />
+                </div>
+              </div>
+              <div className="glass-card kpi-card">
+                <div className="kpi-details">
+                  <h3>Today's Interviews</h3>
+                  <div className="kpi-val">--</div>
+                </div>
+                <div className="kpi-icon-wrapper kpi-rose">
+                  <Calendar size={24} />
+                </div>
+              </div>
+              <div className="glass-card kpi-card">
+                <div className="kpi-details">
+                  <h3>Pending Screening</h3>
+                  <div className="kpi-val">--</div>
+                </div>
+                <div className="kpi-icon-wrapper kpi-purple">
+                  <Briefcase size={24} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '3rem 1.5rem',
+            textAlign: 'center',
+            zIndex: 10
+          }}>
+            <Briefcase size={48} style={{ color: 'var(--text-muted)', marginBottom: '1.25rem' }} />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem' }}>Database Access Restricted</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', maxWidth: '450px', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              The candidate search database, reports, and timeline audits are locked until your profile is approved.
+            </p>
+            <Link href="/jobs" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span>Go to Job Postings</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

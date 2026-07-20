@@ -126,6 +126,20 @@ export const sendSystemAlertEmail = async (adminEmail, alertTitle, alertDetails)
   return sendMail({ to: adminEmail, subject: `[ALERT] ${alertTitle}`, html });
 };
 
+export const sendApprovalEmail = async (userEmail, username) => {
+  const html = `
+    <h1>Account Approved</h1>
+    <p>Hello @${username},</p>
+    <p>Your recruiter account on Paycheck Alpha has been reviewed and approved by the Super Admin.</p>
+    <p>You now have full access to search and view the Candidate Database.</p>
+    <p>Please log in again to activate your database access.</p>
+    <br>
+    <p>Best Regards,</p>
+    <p>Paycheck Alpha Support Team</p>
+  `;
+  return sendMail({ to: userEmail, subject: 'CRDMS Account Approved', html });
+};
+
 export default {
   sendMail,
   sendWelcomeEmail,
@@ -133,5 +147,6 @@ export default {
   sendCandidateStatusUpdateEmail,
   sendInterviewNotificationEmail,
   sendOfferLetterEmail,
-  sendSystemAlertEmail
+  sendSystemAlertEmail,
+  sendApprovalEmail
 };

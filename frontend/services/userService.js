@@ -24,9 +24,23 @@ export const deleteUser = async (id) => {
   });
 };
 
+export const approveUser = async (id) => {
+  return apiClient(`/users/${id}/approve`, {
+    method: 'PUT'
+  });
+};
+
+export const blockUser = async (id) => {
+  return apiClient(`/users/${id}/block`, {
+    method: 'PUT'
+  });
+};
+
 export default {
   getUsers,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  approveUser,
+  blockUser
 };

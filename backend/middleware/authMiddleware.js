@@ -25,10 +25,36 @@ export const authenticateToken = (req, res, next) => {
       id: decoded.id,
       username: decoded.username,
       role: decoded.role,
-      email: decoded.email
+      email: decoded.email,
+      status: decoded.status || 'Pending'
     };
     next();
   });
+};
+
+export const checkApproved = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: 'Unauthorized: User not authenticated'
+    });
+  }
+
+  if (req.user.status === 'Pending') {
+    return res.status(403).json({
+      success: false,
+      message: 'Access Denied: Your account is pending Super Admin approval. You currently have access to Job Postings only.'
+    });
+  }
+
+  if (req.user.status === 'Blocked') {
+    return res.status(403).json({
+      success: false,
+      message: 'Access Denied: Your account is suspended.'
+    });
+  }
+
+  next();
 };
 
 export const authorize = (requiredPermission) => {
@@ -53,5 +79,6 @@ export const authorize = (requiredPermission) => {
 
 export default {
   authenticateToken,
-  authorize
+  authorize,
+  checkApproved
 };

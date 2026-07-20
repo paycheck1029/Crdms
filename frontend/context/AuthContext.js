@@ -37,6 +37,16 @@ export const AuthProvider = ({ children }) => {
     } else if (user && isPublicPage) {
       router.push('/');
     } else if (user) {
+      // Sandboxing for unapproved recruiters
+      if (user.status === 'Pending') {
+        const allowedPendingPaths = ['/', '/jobs', '/jobs/new'];
+        const isAllowedPath = allowedPendingPaths.includes(pathname) || pathname.startsWith('/jobs');
+        if (!isAllowedPath) {
+          router.push('/');
+          return;
+        }
+      }
+
       // Role restrictions mapping permissions to specific path scopes
       const role = user.role;
       if (pathname.startsWith('/admin') && !['Admin'].includes(role)) {

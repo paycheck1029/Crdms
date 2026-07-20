@@ -22,6 +22,7 @@ import candidateRoutes from './routes/candidateRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import logRoutes from './routes/logRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
 
 // Health Check Utility
 import os from 'os';
@@ -121,6 +122,7 @@ app.use('/candidates', apiLimiter, candidateRoutes);
 app.use('/uploads', apiLimiter, uploadRoutes);
 app.use('/reports', apiLimiter, reportRoutes);
 app.use('/logs', apiLimiter, logRoutes);
+app.use('/jobs', apiLimiter, jobRoutes);
 
 // Catch 404
 app.use((req, res, next) => {

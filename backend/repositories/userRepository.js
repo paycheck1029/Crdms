@@ -12,10 +12,10 @@ export const findByEmail = async (email) => {
   return queryGet('SELECT * FROM Users WHERE email = ?', [email]);
 };
 
-export const create = async ({ username, email, passwordHash, role }) => {
+export const create = async ({ username, email, passwordHash, role, status = 'Pending', linkedinId = null, profilePicUrl = null }) => {
   return queryRun(
-    'INSERT INTO Users (username, email, password_hash, role) VALUES (?, ?, ?, ?)',
-    [username, email, passwordHash, role]
+    'INSERT INTO Users (username, email, password_hash, role, status, linkedin_id, profile_pic_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [username, email, passwordHash || '', role, status, linkedinId, profilePicUrl]
   );
 };
 
@@ -37,7 +37,7 @@ export const deleteUser = async (id) => {
 };
 
 export const listAll = async () => {
-  return query('SELECT id, username, email, role, email_verified, created_at FROM Users ORDER BY created_at DESC');
+  return query('SELECT id, username, email, role, status, linkedin_id, profile_pic_url, email_verified, created_at FROM Users ORDER BY created_at DESC');
 };
 
 export const incrementLoginAttempts = async (id) => {
@@ -61,6 +61,18 @@ export const findByRefreshToken = async (token) => {
   return queryGet('SELECT * FROM Users WHERE refresh_token = ?', [token]);
 };
 
+export const updateStatus = async (id, status) => {
+  return queryRun('UPDATE Users SET status = ? WHERE id = ?', [status, id]);
+};
+
+export const findByLinkedinId = async (linkedinId) => {
+  return queryGet('SELECT * FROM Users WHERE linkedin_id = ?', [linkedinId]);
+};
+
+export const linkLinkedin = async (id, linkedinId, profilePicUrl) => {
+  return queryRun('UPDATE Users SET linkedin_id = ?, profile_pic_url = ? WHERE id = ?', [linkedinId, profilePicUrl, id]);
+};
+
 export default {
   findById,
   findByUsername,
@@ -73,5 +85,8 @@ export default {
   resetLoginAttempts,
   lockAccount,
   updateRefreshToken,
-  findByRefreshToken
+  findByRefreshToken,
+  updateStatus,
+  findByLinkedinId,
+  linkLinkedin
 };

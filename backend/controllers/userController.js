@@ -2,6 +2,7 @@ import userService from '../services/userService.js';
 import auditService from '../services/auditService.js';
 import userRepository from '../repositories/userRepository.js';
 import { sendSuccess } from '../utils/responseHelper.js';
+import mailService from '../services/mailService.js';
 
 export const getUsers = async (req, res, next) => {
   try {
@@ -103,9 +104,70 @@ export const deleteUser = async (req, res, next) => {
   }
 };
 
+export const approveUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await userRepository.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const oldUser = { ...user };
+    await userRepository.updateStatus(id, 'Approved');
+    const updatedUser = await userRepository.findById(id);
+
+    await auditService.logActivity(
+      req,
+      'User Approved',
+      `Approved user account: @${user.username}`,
+      oldUser,
+      updatedUser
+    );
+
+    // Trigger transactional email notification
+    await mailService.sendApprovalEmail(user.email, user.username);
+
+    return sendSuccess(res, {}, 'User approved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const blockUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await userRepository.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const oldUser = { ...user };
+    await userRepository.updateStatus(id, 'Blocked');
+    
+    // Invalidate refresh token on block
+    await userRepository.updateRefreshToken(id, null);
+    
+    const updatedUser = await userRepository.findById(id);
+
+    await auditService.logActivity(
+      req,
+      'User Blocked',
+      `Blocked user account: @${user.username}`,
+      oldUser,
+      updatedUser
+    );
+
+    return sendSuccess(res, {}, 'User blocked successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   getUsers,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  approveUser,
+  blockUser
 };

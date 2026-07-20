@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import candidateController from '../controllers/candidateController.js';
-import { authenticateToken, authorize } from '../middleware/authMiddleware.js';
+import { authenticateToken, authorize, checkApproved } from '../middleware/authMiddleware.js';
 import { validateCandidate } from '../validators/candidateValidator.js';
 import { PERMISSIONS } from '../config/roles.js';
 
@@ -12,6 +12,7 @@ const excelUpload = multer({
 });
 
 router.use(authenticateToken);
+router.use(checkApproved);
 
 router.get('/', (req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');

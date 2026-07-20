@@ -202,6 +202,42 @@ export default function AdminPanelPage() {
     }
   };
 
+  const handleApproveUser = async (id, username) => {
+    setError('');
+    setSuccess('');
+    setActionLoading(true);
+    try {
+      await userService.approveUser(id);
+      setSuccess(`User @${username} account successfully approved.`);
+      fetchUsers();
+    } catch (err) {
+      setError(err.message || 'Failed to approve user');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleBlockUser = async (id, username) => {
+    if (id === user.id) {
+      setError('Action blocked: You cannot block your own session admin account.');
+      return;
+    }
+    if (!confirm(`Are you sure you want to suspend/block user @${username}?`)) return;
+
+    setError('');
+    setSuccess('');
+    setActionLoading(true);
+    try {
+      await userService.blockUser(id);
+      setSuccess(`User @${username} account suspended/blocked.`);
+      fetchUsers();
+    } catch (err) {
+      setError(err.message || 'Failed to block user');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   // Filter logs locally
   const filteredLogs = logsList.filter(log => {
     const username = log.username || 'system';
@@ -295,7 +331,8 @@ export default function AdminPanelPage() {
                       <th>Username</th>
                       <th>Email</th>
                       <th>System Role</th>
-                      <th style={{ textAlign: 'right', width: '120px' }}>Actions</th>
+                      <th>Status</th>
+                      <th style={{ textAlign: 'right', width: '220px' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -317,8 +354,48 @@ export default function AdminPanelPage() {
                             {u.role}
                           </span>
                         </td>
+                        <td>
+                          <span className={`badge ${
+                            u.status === 'Approved' ? 'badge-hired' : 
+                            u.status === 'Blocked' ? 'badge-rejected' : 'badge-applied'
+                          }`}>
+                            {u.status || 'Pending'}
+                          </span>
+                        </td>
                         <td style={{ textAlign: 'right' }}>
-                          <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'flex-end' }}>
+                          <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            {u.status !== 'Approved' && (
+                              <button 
+                                className="btn" 
+                                style={{ 
+                                  padding: '0.3rem 0.5rem', 
+                                  fontSize: '0.75rem', 
+                                  background: 'rgba(16, 185, 129, 0.1)', 
+                                  color: 'var(--status-hired)',
+                                  border: '1px solid rgba(16, 185, 129, 0.3)'
+                                }}
+                                disabled={actionLoading}
+                                onClick={() => handleApproveUser(u.id, u.username)}
+                              >
+                                Approve
+                              </button>
+                            )}
+                            {u.status !== 'Blocked' && u.id !== user?.id && (
+                              <button 
+                                className="btn" 
+                                style={{ 
+                                  padding: '0.3rem 0.5rem', 
+                                  fontSize: '0.75rem', 
+                                  background: 'rgba(239, 68, 68, 0.1)', 
+                                  color: 'var(--accent-rose)',
+                                  border: '1px solid rgba(239, 68, 68, 0.3)'
+                                }}
+                                disabled={actionLoading}
+                                onClick={() => handleBlockUser(u.id, u.username)}
+                              >
+                                Block
+                              </button>
+                            )}
                             <button 
                               className="btn btn-secondary" 
                               style={{ 

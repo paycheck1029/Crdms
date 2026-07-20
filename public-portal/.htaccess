@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Prevent looping if file or directory exists
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Rewrite /jobs/123-title-slug to job-detail.php?id=123
+RewriteRule ^jobs/([0-9]+)(-[a-zA-Z0-9-]+)?$ job-detail.php?id=$1 [L,QSA]

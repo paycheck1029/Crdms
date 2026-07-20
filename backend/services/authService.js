@@ -6,7 +6,7 @@ import { logAuth, logError } from './loggerService.js';
 
 export const generateAccessToken = (user) => {
   return jwt.sign(
-    { id: user.id, username: user.username, role: user.role, email: user.email },
+    { id: user.id, username: user.username, role: user.role, email: user.email, status: user.status },
     securityConfig.jwtSecret,
     { expiresIn: securityConfig.accessTokenExpiry }
   );
@@ -25,6 +25,12 @@ export const login = async (email, password) => {
   if (!user) {
     logAuth('Failed login attempt: Email not found', { email });
     throw new Error('Invalid email or password');
+  }
+
+  // Check block status
+  if (user.status === 'Blocked') {
+    logAuth('Blocked user login attempt', { username: user.username, email });
+    throw new Error('Your account has been suspended. Please contact the administrator.');
   }
 
   // Check lockout status
@@ -69,7 +75,8 @@ export const login = async (email, password) => {
       id: user.id,
       username: user.username,
       email: user.email,
-      role: user.role
+      role: user.role,
+      status: user.status
     }
   };
 };
@@ -112,6 +119,68 @@ export const refresh = async (token) => {
   }
 };
 
+export const loginOrRegisterLinkedIn = async ({ linkedinId, email, name, profilePicUrl }) => {
+  if (!linkedinId) {
+    throw new Error('LinkedIn identifier is required');
+  }
+
+  let user = await userRepository.findByLinkedinId(linkedinId);
+
+  if (!user && email) {
+    const existingUser = await userRepository.findByEmail(email);
+    if (existingUser) {
+      await userRepository.linkLinkedin(existingUser.id, linkedinId, profilePicUrl);
+      user = await userRepository.findById(existingUser.id);
+    }
+  }
+
+  if (!user) {
+    let baseUsername = name ? name.toLowerCase().replace(/[^a-z0-9]/g, '') : 'recruiter';
+    let username = baseUsername;
+    let suffix = 1;
+    while (await userRepository.findByUsername(username)) {
+      username = `${baseUsername}${suffix}`;
+      suffix++;
+    }
+
+    const newUser = await userRepository.create({
+      username,
+      email: email || `${username}@linkedin-crdms.com`,
+      passwordHash: null,
+      role: 'Recruiter',
+      status: 'Pending',
+      linkedinId,
+      profilePicUrl
+    });
+
+    user = await userRepository.findById(newUser.id);
+  }
+
+  if (user.status === 'Blocked') {
+    throw new Error('Your account has been suspended. Please contact the administrator.');
+  }
+
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+
+  await userRepository.updateRefreshToken(user.id, refreshToken);
+
+  logAuth('Successful LinkedIn login/registration', { username: user.username, email: user.email });
+
+  return {
+    accessToken,
+    refreshToken,
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+      profilePicUrl: user.profile_pic_url
+    }
+  };
+};
+
 export const logout = async (userId) => {
   const user = await userRepository.findById(userId);
   if (user) {
@@ -126,5 +195,6 @@ export default {
   refresh,
   logout,
   generateAccessToken,
-  generateRefreshToken
+  generateRefreshToken,
+  loginOrRegisterLinkedIn
 };
