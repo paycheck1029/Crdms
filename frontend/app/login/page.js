@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { KeyRound, Mail } from 'lucide-react';
@@ -11,6 +11,28 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const token = searchParams.get('token');
+      const userData = searchParams.get('user');
+      const err = searchParams.get('error');
+
+      if (err) {
+        setError(decodeURIComponent(err));
+      } else if (token && userData) {
+        try {
+          const parsedUser = JSON.parse(decodeURIComponent(userData));
+          localStorage.setItem('crdms_token', token);
+          localStorage.setItem('crdms_user', JSON.stringify(parsedUser));
+          window.location.href = '/';
+        } catch (e) {
+          setError('Failed to complete LinkedIn login authorization.');
+        }
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -10,4 +10,8 @@ router.post('/login', authLimiter, validateLogin, authController.login);
 router.post('/refresh', authController.refresh);
 router.post('/logout', authenticateToken, authController.logout);
 
+// LinkedIn OAuth endpoints
+router.get('/linkedin', authController.linkedinLogin);
+router.get('/linkedin/callback', authController.linkedinCallback);
+
 export default router;
